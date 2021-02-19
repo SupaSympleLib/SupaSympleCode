@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include "SupaSyC/Common.h"
 
 int main()
 {
