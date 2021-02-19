@@ -8,7 +8,7 @@ int main()
 	SetConsoleColor(ConsoleColor_DarkCyan);
 	puts(file->Source);
 	Token *token = Lex(file);
-	printf("First Token (%p): Kind = %i, Text = %.*s", token, token->Kind, token->Length, token->Text);
+	printf("First Token (%p): Kind: %i, Text: %.*s (Length: %i)", token, token->Kind, token->Length, token->Text, token->Length);
 	CloseFile(file);
 	getchar();
 }

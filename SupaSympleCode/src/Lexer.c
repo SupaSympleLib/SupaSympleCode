@@ -1,8 +1,5 @@
 #include "SupaSyC/Common.h"
 
-#define IsIdentifier(c) (c > 'a' && c < 'z' || c > 'A' && c < 'Z' || c == '_')
-#define IsWhiteSpace(c) (c == ' ' || c == '\t' || c == '\r' || c == 0xCC)
-
 typedef struct
 {
 	const char *p;
@@ -17,14 +14,19 @@ typedef struct
 static void ParseIdentifier(Lexer *);
 static void NewLexToken(Lexer *This, TokenKind kind, const char *beg, Evaluation eval);
 
+static bool IsIdentifier(char c)
+{ return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_'; }
+static bool IsWhiteSpace(char c)
+{ return c == ' ' || c == '\t' || c == '\r' || c == 0xCC; }
+
 Token *Lex(const File *file)
 {
-	Token defTok = {};
-	Lexer lexObj = { file->Source, file, &defTok, {} };
+	Token defTok;
+	Lexer lexObj = (Lexer) { file->Source, file, &defTok, (TokenTrivia) { false, false }, 0, 0 };
 	Lexer *This = &lexObj;
 
 
-	This->triv = {};
+	This->triv = (TokenTrivia) { false, false };
 	while (*This->p)
 	{
 		while (IsWhiteSpace(*This->p))
@@ -47,6 +49,9 @@ Token *Lex(const File *file)
 			This->ln++;
 			This->p++;
 			break;
+		default:
+
+			break;
 		}
 	}
 
@@ -56,9 +61,11 @@ Token *Lex(const File *file)
 static void ParseIdentifier(Lexer *This)
 {
 	const char *beg = This->p;
-	while (IsIdentifier(*This->p++));
+	This->p++;
+	while (IsIdentifier(*This->p))
+		This->p++;
 
-	NewLexToken(This, TK_Identifier, beg, {});
+	NewLexToken(This, TK_Identifier, beg, (Evaluation) { null });
 }
 
 
@@ -74,7 +81,7 @@ Token *NewToken(TokenKind kind, const char *text, const char *end, const File *f
 	Token *This = Alloc(1, Token);
 	This->Kind = kind;
 	This->Text = text;
-	This->Length = text - end;
+	This->Length = end - text;
 	This->File = file;
 
 	This->Line = ln;
