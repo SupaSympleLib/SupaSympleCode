@@ -18,7 +18,7 @@
     <ClCompile Include="src\Main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common.c">
+    <ClCompile Include="src\File.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,5 +29,8 @@
     <ClInclude Include="include\SupaSyC\Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="sy\Main.sy" />
   </ItemGroup>
 </Project>

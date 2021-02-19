@@ -2,6 +2,7 @@
 
 int main()
 {
-	puts("Hello, world!");
+	File *file = OpenFile("sy/Main.sy", FILEMODE_READ);
+	puts(file->Source);
 	getchar();
 }
