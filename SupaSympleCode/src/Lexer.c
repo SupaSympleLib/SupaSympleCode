@@ -8,9 +8,11 @@ typedef struct
 	TokenTrivia triv;
 
 	uint32_t ln;
+	uint32_t col;
 	uint32_t disLn;
 } Lexer;
 
+static const char *Next(Lexer *);
 static void ParseIdentifier(Lexer *);
 static void NewLexToken(Lexer *This, TokenKind kind, const char *beg, Evaluation eval);
 
@@ -32,7 +34,7 @@ Token *Lex(const File *file)
 		while (IsWhiteSpace(*This->p))
 		{
 			This->triv.AfterSpace = true;
-			This->p++;
+			Next(This);
 		}
 
 		if (IsIdentifier(*This->p))
@@ -47,10 +49,9 @@ Token *Lex(const File *file)
 			This->triv.StartOfLine = true;
 			This->triv.AfterSpace = false;
 			This->ln++;
+			This->col = 0;
+			This->disLn++;
 			This->p++;
-			break;
-		default:
-
 			break;
 		}
 	}
@@ -58,12 +59,18 @@ Token *Lex(const File *file)
 	return defTok.Next;
 }
 
+static const char *Next(Lexer *This)
+{
+	This->col++;
+	return This->p++;
+}
+
 static void ParseIdentifier(Lexer *This)
 {
 	const char *beg = This->p;
-	This->p++;
+	Next(This);
 	while (IsIdentifier(*This->p))
-		This->p++;
+		Next(This);
 
 	NewLexToken(This, TK_Identifier, beg, (Evaluation) { null });
 }
@@ -71,20 +78,22 @@ static void ParseIdentifier(Lexer *This)
 
 static void NewLexToken(Lexer *This, TokenKind kind, const char *beg, Evaluation eval)
 {
-	Token *tok = NewToken(kind, beg, This->p, This->file, This->ln, This->disLn, This->triv, eval, null);
+	uint32_t len = This->p - beg;
+	Token *tok = NewToken(kind, beg, len, This->file, This->ln, This->col - len + 1, This->disLn, This->triv, eval, null);
 	This->tok->Next = tok;
 	This->tok = tok;
 }
 
-Token *NewToken(TokenKind kind, const char *text, const char *end, const File *file, uint32_t ln, uint32_t disLn, TokenTrivia trivia, Evaluation eval, Token *next)
+Token *NewToken(TokenKind kind, const char *text, uint32_t len, const File *file, uint32_t ln, uint32_t col, uint32_t disLn, TokenTrivia trivia, Evaluation eval, Token *next)
 {
 	Token *This = Alloc(1, Token);
 	This->Kind = kind;
 	This->Text = text;
-	This->Length = end - text;
+	This->Length = len;
 	This->File = file;
 
 	This->Line = ln;
+	This->Column = col;
 	This->DisplayLine = disLn;
 	This->Trivia = trivia;
 	This->Eval = eval;
