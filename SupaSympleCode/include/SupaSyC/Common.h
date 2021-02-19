@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning(disable: 26812)
 
 #include <stdio.h>
 #include <stdint.h>
@@ -43,12 +44,19 @@ struct Token
 	TokenTrivia Trivia;
 	Evaluation Eval;
 	
-	const Token* Next;
+	Token* Next;
 };
 
-Token* NewToken(TokenKind, const char *text, const char *textEnd, const File *file, uint32_t line, uint32_t displayLine, TokenTrivia trivia, Evaluation, const Token* next);
+Token* NewToken(TokenKind, const char *text, const char *textEnd, const File *file, uint32_t line, uint32_t displayLine, TokenTrivia trivia, Evaluation, Token* next);
 void DeleteToken(const Token*, bool deleteNext);
 Token* Lex(const File* file);
 
-#define Alloc(count, ty) (ty*)calloc(count, sizeof(ty))
+#define Alloc(count, ty) (ty*)_Alloc(count, sizeof(ty))
 #define Free(ptr) free((void*)ptr)
+
+inline void *_Alloc(uint32_t count, uint32_t sz)
+{
+	void *ptr = calloc(count, sz);
+	assert(ptr);
+	return ptr;
+}
