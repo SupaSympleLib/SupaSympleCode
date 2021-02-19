@@ -10,10 +10,6 @@ typedef struct
 	uint32_t Number;
 	const char *Name;
 	const char *Source;
-
-	// For #line directive
-	const char *DisplayName;
-	uint32_t DisplayLine;
 } File;
 
 typedef enum
