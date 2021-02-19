@@ -43,11 +43,15 @@ File *OpenFile(const char *name, FileMode mode)
 	{
 		file->Stream = fopen(name, strMode);
 		fseek(file->Stream, 0, SEEK_END);
-		uint32_t buffSz = ftell(file->Stream) + 1;
-		file->Source = Alloc(buffSz, char);
+		uint32_t buffSz = ftell(file->Stream);
+		file->Source = Alloc(buffSz + 1, char);
+		rewind(file->Stream);
+		fread(file->Source, sizeof(char), buffSz, file->Stream);
 	}
 	else
 		file->Source = "";
+
+	return file;
 }
 
 void CloseFile(const File *file)
