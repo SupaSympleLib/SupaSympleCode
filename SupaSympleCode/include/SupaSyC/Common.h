@@ -8,11 +8,11 @@
 typedef struct
 {
 	uint32_t Number;
-	const char* Name;
-	const char* Source;
+	const char *Name;
+	const char *Source;
 
 	// For #line directive
-	const char* DisplayName;
+	const char *DisplayName;
 	uint32_t DisplayLine;
 } File;
 
@@ -25,15 +25,24 @@ typedef struct Token Token;
 struct Token
 {
 	TokenKind Kind;
+	const char *Text;
+	uint32_t Length; // Length of text
+
+	const File *File;
+	uint32_t Line;
+	uint32_t DisplayLine; // For #line
+
+	bool StartOfLine : 1;
+	bool AfterSpace : 1;
+
+	// Evaluation
 	union
 	{
 		int32_t Int32Eval;
 		uint32_t UInt32Eval;
 	};
-
-
-
+	
 	Token* Next;
 };
 
-Token* Lex(const char* source);
+Token* Lex(const File* file);

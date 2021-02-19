@@ -1,7 +1,15 @@
 #include "SupaSyC/Common.h"
 
-Token* Lex(const char* source)
+#define IsIdentifier(c) (c > 'a' && c < 'z' || c > 'A' && c < 'Z' || c == '_')
+
+static Token* ParseIdentifier();
+
+Token* Lex(const File *file)
 {
-	char c = *source;
-	if (c > 'a' && c < 'z')
+	const char* current = file->Source;
+	char c = *current;
+	if (IsIdentifier(c))
+	{
+
+	}
 }
