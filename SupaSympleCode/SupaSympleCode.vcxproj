@@ -90,6 +90,7 @@
     </ClCompile>
     <ClCompile Include="src\Console.c" />
     <ClCompile Include="src\File.c" />
+    <ClCompile Include="src\Lexer.c" />
     <ClCompile Include="src\Main.c" />
   </ItemGroup>
   <ItemGroup>
@@ -97,7 +98,6 @@
     <ClInclude Include="include\SupaSyC\Console.h" />
     <ClInclude Include="include\SupaSyC\File.h" />
     <ClInclude Include="include\SupaSyC\Token.h" />
-    <ClInclude Include="src\Lexer.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sy\Main.sy" />

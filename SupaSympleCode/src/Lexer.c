@@ -20,7 +20,7 @@ static void NewLexToken(Lexer *This, TokenKind kind, const char *beg, Evaluation
 Token *Lex(const File *file)
 {
 	Token defTok = {};
-	Lexer lexObj = Lexer { file->Source, file, &defTok, TokenTrivia { false, false } };
+	Lexer lexObj = { file->Source, file, &defTok, {} };
 	Lexer *This = &lexObj;
 
 
@@ -55,10 +55,10 @@ Token *Lex(const File *file)
 
 static void ParseIdentifier(Lexer *This)
 {
-	const char* beg = This->p;
+	const char *beg = This->p;
 	while (IsIdentifier(*This->p++));
-	
-	NewLexToken(This, TK_Identifier, beg, Evaluation {});
+
+	NewLexToken(This, TK_Identifier, beg, {});
 }
 
 
@@ -71,7 +71,7 @@ static void NewLexToken(Lexer *This, TokenKind kind, const char *beg, Evaluation
 
 Token *NewToken(TokenKind kind, const char *text, const char *end, const File *file, uint32_t ln, uint32_t disLn, TokenTrivia trivia, Evaluation eval, Token *next)
 {
-	Token* This = Alloc(1, Token);
+	Token *This = Alloc(1, Token);
 	This->Kind = kind;
 	This->Text = text;
 	This->Length = text - end;
