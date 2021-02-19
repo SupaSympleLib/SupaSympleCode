@@ -21,6 +21,9 @@
     <ClCompile Include="src\File.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Lexer.c">

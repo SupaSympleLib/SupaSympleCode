@@ -1,5 +1,6 @@
 #pragma once
-#pragma warning(disable: 26812)
+#pragma warning(disable: 26812, 6031)
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
 #include <stdint.h>
