@@ -44,6 +44,9 @@
     <ClInclude Include="include\SupaSyC\Console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\SupaSyC\Ast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="sy\Main.sy" />

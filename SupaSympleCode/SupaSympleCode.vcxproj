@@ -94,6 +94,7 @@
     <ClCompile Include="src\Main.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\SupaSyC\Ast.h" />
     <ClInclude Include="include\SupaSyC\Common.h" />
     <ClInclude Include="include\SupaSyC\Console.h" />
     <ClInclude Include="include\SupaSyC\File.h" />
