@@ -27,8 +27,27 @@ Token *Lex(const File *file)
 	This->triv = {};
 	while (*This->p)
 	{
+		while (IsWhiteSpace(*This->p))
+		{
+			This->triv.AfterSpace = true;
+			This->p++;
+		}
+
 		if (IsIdentifier(*This->p))
+		{
 			ParseIdentifier(This);
+			continue;
+		}
+
+		switch (*This->p)
+		{
+		case '\n':
+			This->triv.StartOfLine = true;
+			This->triv.AfterSpace = false;
+			This->ln++;
+			This->p++;
+			break;
+		}
 	}
 
 	return defTok.Next;
