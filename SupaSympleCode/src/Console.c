@@ -9,7 +9,9 @@ void ResetConsoleColor()
 { SetConsoleColor(ConsoleColor_Reset); }
 
 #if _WIN32
+#define OpenFile WinApiOpenFile // Since windows has there own function named 'OpenFile' just change the name
 #include <windows.h>
+#undef OpenFile
 
 static HANDLE sStdOutHandle = null;
 

@@ -2,7 +2,7 @@
 
 static uint32_t sNumFiles;
 
-File *sscOpenFile(const char *name, FileMode mode)
+File *OpenFile(const char *name, FileMode mode)
 {
 	File *file = Alloc(1, File);
 	file->Number = sNumFiles;
@@ -54,7 +54,7 @@ File *sscOpenFile(const char *name, FileMode mode)
 	return file;
 }
 
-void sscCloseFile(const File *file)
+void CloseFile(const File *file)
 {
 	fclose(file->Stream);
 	Free(file);
