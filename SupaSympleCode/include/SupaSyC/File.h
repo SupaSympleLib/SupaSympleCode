@@ -18,5 +18,5 @@ typedef enum
 	FILEMODE_READ_APPEND, // Read and Append
 } FileMode;
 
-File *OpenFile(const char *name, FileMode mode);
-void CloseFile(const File *);
+File *sscOpenFile(const char *name, FileMode mode);
+void sscCloseFile(const File *);
