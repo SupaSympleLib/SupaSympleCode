@@ -3,6 +3,8 @@
 typedef enum
 {
 	TK_Identifier,
+
+	TK_Last = TK_Identifier,
 } TokenKind;
 
 typedef struct
@@ -31,6 +33,11 @@ struct Token
 	Evaluation Eval;
 
 	Token *Next;
+};
+
+static const char *const TokenKindNames[TK_Last + 1] =
+{
+	"Identifier",
 };
 
 Token *NewToken(TokenKind, const char *text, const char *textEnd, const File *file, uint32_t line, uint32_t displayLine, TokenTrivia trivia, Evaluation, Token *next);
