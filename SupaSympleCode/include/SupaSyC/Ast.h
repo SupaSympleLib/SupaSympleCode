@@ -2,7 +2,13 @@
 
 typedef enum
 {
-	AST_Plus,
+	AST_Null,
+
+	AST_Addition,
+	AST_Subtraction,
+	AST_Multiplication,
+	AST_Division,
+
 	AST_Number,
 
 	AST_Last = AST_Number,
@@ -10,7 +16,13 @@ typedef enum
 
 static const char *const AstKindNames[AST_Last + 1] =
 {
-	"PlusAst",
+	"NullAst",
+
+	"AdditionAst",
+	"SubtractionAst",
+	"MultiplicationAst",
+	"DivisionAst",
+
 	"NumberAst",
 };
 

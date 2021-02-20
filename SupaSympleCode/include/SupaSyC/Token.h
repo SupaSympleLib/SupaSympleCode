@@ -9,8 +9,11 @@ typedef enum
 
 	TK_Punctuation, // Used to mark start of punctuations
 	TK_Plus = TK_Punctuation,
+	TK_Minus,
+	TK_Star,
+	TK_Slash,
 
-	TK_Last = TK_Plus,
+	TK_Last = TK_Slash,
 } TokenKind;
 
 static const char *const TokenKindNames[TK_Last + 1] =
@@ -21,6 +24,9 @@ static const char *const TokenKindNames[TK_Last + 1] =
 	"IdentifierToken",
 
 	"PlusToken",
+	"MinusToken",
+	"StarToken",
+	"SlashToken",
 };
 
 typedef struct

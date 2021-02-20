@@ -12,6 +12,7 @@ static void ParseBinaryExpression(Parser *, uint8_t parentPrecedence);
 static void ParsePrimaryExpression(Parser *);
 
 static uint8_t GetBinaryOperatorPrecedence(TokenKind);
+static AstKind GetBinaryOperatorNode(TokenKind);
 
 static const Token *Next(Parser *);
 static const Token *Match(Parser *, TokenKind kind);
@@ -35,13 +36,13 @@ static void ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 	ParsePrimaryExpression(This);
 	AstNode *left = This->node;
 
-	while (This->tok->Kind == TK_Plus)
+	while (true)
 	{
 		const Token *op = This->tok;
 		uint8_t precedence = GetBinaryOperatorPrecedence(op->Kind);
 		if (!precedence || parentPrecedence && precedence > parentPrecedence)
 			break;
-		NewParseAstNode(This, AST_Plus, Next(This));
+		NewParseAstNode(This, GetBinaryOperatorNode(op->Kind), Next(This));
 		base->Next = This->node;
 		This->node = This->node->Next = left;
 
@@ -101,7 +102,7 @@ void DeleteAstNode(const AstNode *This, bool deleteNext)
 
 void PrintAstNode(const AstNode *This)
 {
-	printf("%-10s -> ", AstKindNames[This->Kind]);
+	printf("%-18s -> ", AstKindNames[This->Kind]);
 	PrintToken(This->Token);
 }
 
@@ -110,9 +111,30 @@ static uint8_t GetBinaryOperatorPrecedence(TokenKind kind)
 {
 	switch (kind)
 	{
+	case TK_Star:
+	case TK_Slash:
+		return 3;
 	case TK_Plus:
+	case TK_Minus:
 		return 4;
 	default:
 		return 0;
+	}
+}
+
+static AstKind GetBinaryOperatorNode(TokenKind kind)
+{
+	switch (kind)
+	{
+	case TK_Plus:
+		return AST_Addition;
+	case TK_Minus:
+		return AST_Subtraction;
+	case TK_Star:
+		return AST_Multiplication;
+	case TK_Slash:
+		return AST_Division;
+	default:
+		return AST_Null;
 	}
 }
