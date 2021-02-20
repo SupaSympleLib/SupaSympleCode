@@ -1,5 +1,5 @@
 #pragma once
-#pragma warning(disable: 26812 6031)
+#pragma warning(disable: 26812 6031 4090)
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
@@ -13,6 +13,7 @@
 #include "SupaSyC/File.h"
 #include "SupaSyC/Token.h"
 #include "SupaSyC/Ast.h"
+#include "SupaSyC/Evaluator.h"
 
 bool StringStartsWith(const char *string, const char *start);
 

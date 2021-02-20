@@ -22,6 +22,12 @@ int main()
 	AstNode *ast = Parse(token);
 	PrintAst(ast);
 
+	int32_t eval = Evaluate(ast);
+	SetConsoleColor(ConsoleColor_Yellow);
+	printf("Evaluation: ");
+	SetConsoleColor(ConsoleColor_Green);
+	printf("%i\n", eval);
+
 	CloseFile(file);
 	getchar();
 }

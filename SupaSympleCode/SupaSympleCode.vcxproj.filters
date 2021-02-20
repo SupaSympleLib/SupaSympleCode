@@ -33,6 +33,9 @@
     <ClCompile Include="src\Parser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Evaluator.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SupaSyC\Common.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\SupaSyC\Ast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SupaSyC\Evaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
