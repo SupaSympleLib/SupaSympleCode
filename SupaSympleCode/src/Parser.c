@@ -8,8 +8,10 @@ typedef struct
 
 static void NewParseAstNode(Parser *, AstKind, const Token *);
 static void ParseExpression(Parser *);
-static void ParseBinaryExpression(Parser *);
+static void ParseBinaryExpression(Parser *, uint8_t parentPrecedence);
 static void ParsePrimaryExpression(Parser *);
+
+static uint8_t GetBinaryOperatorPrecedence(TokenKind);
 
 static const Token *Next(Parser *);
 static const Token *Match(Parser *, TokenKind kind);
@@ -25,9 +27,9 @@ AstNode *Parse(const Token *toks)
 }
 
 static void ParseExpression(Parser *This)
-{ ParseBinaryExpression(This); }
+{ ParseBinaryExpression(This, 0); }
 
-static void ParseBinaryExpression(Parser *This)
+static void ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 {
 	AstNode *base = This->node;
 	ParsePrimaryExpression(This);
@@ -35,11 +37,15 @@ static void ParseBinaryExpression(Parser *This)
 
 	while (This->tok->Kind == TK_Plus)
 	{
+		const Token *op = This->tok;
+		uint8_t precedence = GetBinaryOperatorPrecedence(op->Kind);
+		if (!precedence || parentPrecedence && precedence > parentPrecedence)
+			break;
 		NewParseAstNode(This, AST_Plus, Next(This));
 		base->Next = This->node;
 		This->node = This->node->Next = left;
 
-		ParseBinaryExpression(This);
+		ParseBinaryExpression(This, precedence);
 	}
 }
 
@@ -52,7 +58,6 @@ static void ParsePrimaryExpression(Parser *This)
 		break;
 	}
 }
-
 
 
 static const Token *Next(Parser *This)
@@ -98,4 +103,16 @@ void PrintAstNode(const AstNode *This)
 {
 	printf("%-10s -> ", AstKindNames[This->Kind]);
 	PrintToken(This->Token);
+}
+
+
+static uint8_t GetBinaryOperatorPrecedence(TokenKind kind)
+{
+	switch (kind)
+	{
+	case TK_Plus:
+		return 4;
+	default:
+		return 0;
+	}
 }
