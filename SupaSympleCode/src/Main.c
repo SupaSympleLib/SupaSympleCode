@@ -1,6 +1,7 @@
 #include "SupaSyC/Common.h"
 
 static void PrintTokens(Token *);
+static void PrintAst(AstNode *);
 
 int main()
 {
@@ -16,19 +17,37 @@ int main()
 	Token *token = Lex(file);
 	PrintTokens(token);
 
+	SetConsoleColor(ConsoleColor_Yellow);
+	printf("Ast from '%s':\n", file->Name);
+	AstNode *ast = Parse(token);
+	PrintAst(ast);
+
 	CloseFile(file);
 	getchar();
 }
 
-static void PrintTokens(Token *token)
+static void PrintTokens(Token *tok)
 {
-	while (token)
+	while (tok)
 	{
 		SetConsoleColor(ConsoleColor_Cyan);
-		printf("%s", token->Next ? "|--" : "L--");
+		printf("%s", tok->Next ? "|--" : "L--");
 		SetConsoleColor(ConsoleColor_Green);
-		printf("%-10s '%1.*s' (%u:%u)\n", TokenKindNames[token->Kind], token->Length, token->Text, token->DisplayLine, token->Column);
+		PrintToken(tok);
 
-		token = token->Next;
+		tok = tok->Next;
+	}
+}
+
+static void PrintAst(AstNode *ast)
+{
+	while (ast)
+	{
+		SetConsoleColor(ConsoleColor_Cyan);
+		printf("%s", ast->Next ? "|--" : "L--");
+		SetConsoleColor(ConsoleColor_Green);
+		PrintAstNode(ast);
+
+		ast = ast->Next;
 	}
 }

@@ -27,7 +27,7 @@ static bool IsWhiteSpace(char c)
 
 Token *Lex(const File *file)
 {
-	Token defTok;
+	Token defTok = { .Next = null };
 	Lexer lexObj = (Lexer) { file->Source, file, &defTok, (TokenTrivia) { false, false }, 0, 0 };
 	Lexer *This = &lexObj;
 
@@ -149,4 +149,11 @@ void DeleteToken(const Token *This, bool delNext)
 	if (delNext)
 		DeleteToken(This->Next, true);
 	Free(This);
+}
+
+
+void PrintToken(const Token *This)
+{
+	SetConsoleColor(ConsoleColor_Green);
+	printf("%-16s '%1.*s' (%u:%u)\n", TokenKindNames[This->Kind], This->Length, This->Text, This->DisplayLine, This->Column);
 }

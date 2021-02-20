@@ -92,6 +92,7 @@
     <ClCompile Include="src\File.c" />
     <ClCompile Include="src\Lexer.c" />
     <ClCompile Include="src\Main.c" />
+    <ClCompile Include="src\Parser.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SupaSyC\Ast.h" />

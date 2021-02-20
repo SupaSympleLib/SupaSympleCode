@@ -15,12 +15,12 @@ typedef enum
 
 static const char *const TokenKindNames[TK_Last + 1] =
 {
-	"EndOfFile",
+	"EndOfFileToken",
 
-	"Number",
-	"Identifier",
+	"NumberToken",
+	"IdentifierToken",
 
-	"Plus",
+	"PlusToken",
 };
 
 typedef struct
@@ -53,3 +53,5 @@ struct Token
 
 Token *NewToken(TokenKind, const char *text, uint32_t textLength, const File *file, uint32_t line, uint32_t column, uint32_t displayLine, TokenTrivia trivia, Token *next);
 void DeleteToken(const Token *, bool deleteNext);
+
+void PrintToken(const Token*);

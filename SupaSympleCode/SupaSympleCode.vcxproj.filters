@@ -30,6 +30,9 @@
     <ClCompile Include="src\Lexer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Parser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SupaSyC\Common.h">

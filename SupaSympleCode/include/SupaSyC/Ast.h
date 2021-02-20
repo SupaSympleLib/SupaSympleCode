@@ -10,8 +10,8 @@ typedef enum
 
 static const char *const AstKindNames[AST_Last + 1] =
 {
-	"Plus",
-	"Number",
+	"PlusAst",
+	"NumberAst",
 };
 
 
@@ -23,3 +23,8 @@ struct AstNode
 
 	AstNode *Next;
 };
+
+AstNode *NewAstNode(AstKind, const Token *token, AstNode* next);
+void DeleteAstNode(const AstNode *, bool deleteNext);
+
+void PrintAstNode(const AstNode *);
