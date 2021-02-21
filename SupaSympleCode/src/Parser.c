@@ -67,7 +67,17 @@ static AstNode *ParseVariableDeclaration(Parser *This)
 	Match(This, TK_VarKeyword);
 	const Token *name = Match(This, TK_Identifier);
 	
-	return NewAstNode(AST_VariableDeclaration, name, null);
+	AstNode *node = NewAstNode(AST_VariableDeclaration, name, null);
+	AstNode *init;
+	if (This->tok->Kind == TK_Equal)
+	{
+		Next(This);
+		init = ParseExpression(This);
+	}
+	else
+		init = NewAstNode(AST_Null, name, null);
+	node->Next = init;
+	return node;
 }
 
 
@@ -161,7 +171,7 @@ void DeleteAstNode(const AstNode *This, bool delNext)
 	if (!This)
 		return;
 
-	DeleteToken(This->Token, false);
+	DeleteToken(This->Token, delNext);
 	if (delNext)
 		DeleteAstNode(This->Next, delNext);
 	Free(This);
@@ -169,7 +179,7 @@ void DeleteAstNode(const AstNode *This, bool delNext)
 
 void PrintAstNode(const AstNode *This)
 {
-	printf("%-18s -> ", AstKindNames[This->Kind]);
+	printf("%-24s -> ", AstKindNames[This->Kind]);
 	PrintToken(This->Token);
 }
 

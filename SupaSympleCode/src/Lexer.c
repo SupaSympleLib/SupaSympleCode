@@ -143,7 +143,8 @@ static void ParsePunctuation(Lexer *This)
 	const char *const punctuations[] =
 	{
 		"+", "-", "*", "/", "%",
-		";"
+		"=",
+		";",
 	};
 
 	uint32_t punc = -1;

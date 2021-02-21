@@ -53,8 +53,9 @@ static int32_t EvaluateInternal(Evaluator *This)
 		BIN_OP(/ );
 	case AST_Modulo:
 		BIN_OP(%);
-	case AST_Null:
 	case AST_VariableDeclaration:
+		return EvaluateInternal(This);
+	case AST_Null:
 		return null;
 	default:
 		ErrorAt(ast->Token, "Expected expression");
@@ -67,7 +68,5 @@ int32_t Evaluate(const AstNode *ast, AstNode **astPtr)
 	int32_t eval = EvaluateInternal(This);
 	if (astPtr)
 		*astPtr = This->ast;
-	else
-		DeleteAstNode(ast, true);
 	return eval;
 }

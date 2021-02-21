@@ -25,7 +25,6 @@ int main()
 
 	PrintEval(ast);
 
-	DeleteAstNode(ast, true);
 	CloseFile(file);
 	getchar();
 }
