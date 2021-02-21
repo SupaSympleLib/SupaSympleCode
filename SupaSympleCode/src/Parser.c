@@ -44,17 +44,19 @@ static void ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 
 	while (true)
 	{
-		const Token *op = This->tok;
-		uint8_t precedence = GetBinaryOperatorPrecedence(op);
-		if (!precedence || parentPrecedence && precedence >= parentPrecedence)
+		const Token *opTok = This->tok;
+		uint8_t precedence = GetBinaryOperatorPrecedence(opTok);
+		if (!precedence || parentPrecedence && precedence < parentPrecedence)
 			break;
-		NewParseAstNode(This, GetBinaryOperatorNode(op), Next(This));
-		// Swap (Move the operator ast before left value)
-		base->Next = This->node;
-		This->node = This->node->Next = left;
+		NewParseAstNode(This, GetBinaryOperatorNode(opTok), Next(This));
+		AstNode *op = This->node;
 
 		ParseBinaryExpression(This, precedence);
-		left = This->node;
+		AstNode *right = op->Next;
+
+		base->Next = op;
+		op->Next = left;
+		left->Next = right;
 	}
 }
 
