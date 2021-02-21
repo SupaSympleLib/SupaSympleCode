@@ -24,7 +24,9 @@ AstNode *Parse(const Token *toks)
 
 	while (This->tok->Kind != TK_EndOfFile)
 	{
-		This->node = ParseExpression(This);
+		This->node->Next = ParseExpression(This);
+		while (This->node->Next)
+			This->node = This->node->Next;
 		Match(This, TK_Semicolon);
 	}
 
@@ -37,17 +39,18 @@ AstNode *Parse(const Token *toks)
 static AstNode *ParseExpression(Parser *This)
 { return ParseBinaryExpression(This, 0); }
 
-static AstNode *NewBinary(const Token *opTok, const AstNode *leftStart, AstNode *leftEnd, const AstNode *right)
+static AstNode *NewBinary(const Token *opTok, AstNode *left, const AstNode *right)
 {
-	AstNode *ast = NewAstNode(GetBinaryOperatorNode(opTok), opTok, leftStart);
-	leftEnd->Next = right;
+	AstNode *ast = NewAstNode(GetBinaryOperatorNode(opTok), opTok, left);
+	while (left->Next)
+		left = left->Next;
+	left->Next = right;
 	return ast;
 }
 
 static AstNode *ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 {
-	AstNode *left = This->node->Next = ParsePrimaryExpression(This);
-	AstNode *leftEnd = left;
+	AstNode *left = ParsePrimaryExpression(This);
 
 	while (true)
 	{
@@ -56,14 +59,12 @@ static AstNode *ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 		if (!precedence || parentPrecedence && precedence >= parentPrecedence)
 		{
 			SetConsoleColor(ConsoleColor_DarkYellow);
-			assert(!leftEnd->Next);
-			return leftEnd;
+			return left;
 		}
 		Next(This);
 		AstNode *right = ParseBinaryExpression(This, precedence);
 		
-		left = NewBinary(opTok, left, leftEnd, right);
-		leftEnd = right;
+		left = NewBinary(opTok, left, right);
 	}
 }
 
