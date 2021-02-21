@@ -51,10 +51,28 @@ Token *Lex(const File *file)
 			continue;
 		}
 
+		// Single line comment
 		if (StringStartsWith(This->p, "//"))
 		{
+			// Skip two characters (Sizeof "//")
+			Next(This);
+			Next(This);
 			while (*This->p != '\n')
 				Next(This);
+			continue;
+		}
+
+		// Block comment
+		if (StringStartsWith(This->p, "/*"))
+		{
+			// Skip two characters (Sizeof "/*")
+			Next(This);
+			Next(This);
+			while (!StringStartsWith(This->p, "*/"))
+				Next(This);
+			// Skip two characters (Sizeof "*/")
+			Next(This);
+			Next(This);
 			continue;
 		}
 
