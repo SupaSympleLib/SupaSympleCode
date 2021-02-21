@@ -39,7 +39,7 @@ static int32_t EvaluateInternal(Evaluator *This)
 	case AST_Multiplication:
 		BIN_OP(*);
 	case AST_Division:
-		BIN_OP(/);
+		BIN_OP(/ );
 	case AST_Modulo:
 		BIN_OP(%);
 	case AST_Null:
@@ -55,5 +55,7 @@ int32_t Evaluate(const AstNode *ast, AstNode **astPtr)
 	int32_t eval = EvaluateInternal(This);
 	if (astPtr)
 		*astPtr = This->ast;
+	else
+		DeleteAstNode(ast, true);
 	return eval;
 }

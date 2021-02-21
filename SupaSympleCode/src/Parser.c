@@ -46,13 +46,15 @@ static void ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 	{
 		const Token *op = This->tok;
 		uint8_t precedence = GetBinaryOperatorPrecedence(op);
-		if (!precedence || parentPrecedence && precedence > parentPrecedence)
+		if (!precedence || parentPrecedence && precedence >= parentPrecedence)
 			break;
 		NewParseAstNode(This, GetBinaryOperatorNode(op), Next(This));
+		// Swap (Move the operator ast before left value)
 		base->Next = This->node;
 		This->node = This->node->Next = left;
 
 		ParseBinaryExpression(This, precedence);
+		left = This->node;
 	}
 }
 
@@ -102,11 +104,14 @@ AstNode *NewAstNode(AstKind kind, const Token *tok, AstNode *next)
 	return This;
 }
 
-void DeleteAstNode(const AstNode *This, bool deleteNext)
+void DeleteAstNode(const AstNode *This, bool delNext)
 {
+	if (!This)
+		return;
+
 	DeleteToken(This->Token, false);
-	if (deleteNext)
-		DeleteAstNode(This->Next, deleteNext);
+	if (delNext)
+		DeleteAstNode(This->Next, delNext);
 	Free(This);
 }
 

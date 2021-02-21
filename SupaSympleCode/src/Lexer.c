@@ -51,6 +51,13 @@ Token *Lex(const File *file)
 			continue;
 		}
 
+		if (StringStartsWith(This->p, "//"))
+		{
+			while (*This->p != '\n')
+				Next(This);
+			continue;
+		}
+
 		switch (*This->p)
 		{
 		case '\n':
@@ -151,8 +158,11 @@ Token *NewToken(TokenKind kind, const char *text, uint32_t len, const File *file
 
 void DeleteToken(const Token *This, bool delNext)
 {
+	if (!This)
+		return;
+
 	if (delNext)
-		DeleteToken(This->Next, true);
+		DeleteToken(This->Next, delNext);
 	Free(This);
 }
 

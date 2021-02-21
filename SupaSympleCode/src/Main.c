@@ -2,6 +2,7 @@
 
 static void PrintTokens(Token *);
 static void PrintAst(AstNode *);
+static void PrintEval(AstNode *);
 
 int main()
 {
@@ -22,18 +23,9 @@ int main()
 	printf("Ast from '%s':\n", file->Name);
 	PrintAst(ast);
 
-	while (ast)
-	{
-		int32_t eval = Evaluate(ast, &ast);
-		SetConsoleColor(ConsoleColor_Yellow);
-		printf("Evaluation (Line %i): ", ast->Token->DisplayLine);
-		SetConsoleColor(ConsoleColor_Green);
-		printf("%i\n", eval);
+	PrintEval(ast);
 
-		if (!ast->Next)
-			break;
-	}
-
+	DeleteAstNode(ast, true);
 	CloseFile(file);
 	getchar();
 }
@@ -61,5 +53,21 @@ static void PrintAst(AstNode *ast)
 		PrintAstNode(ast);
 
 		ast = ast->Next;
+	}
+}
+
+static void PrintEval(AstNode *ast)
+{
+	while (ast)
+	{
+		uint32_t ln = ast->Token->DisplayLine;
+		int32_t eval = Evaluate(ast, &ast);
+		SetConsoleColor(ConsoleColor_Yellow);
+		printf("Evaluation (Line %u): ", ln);
+		SetConsoleColor(ConsoleColor_Green);
+		printf("%i\n", eval);
+
+		if (!ast->Next)
+			break;
 	}
 }
