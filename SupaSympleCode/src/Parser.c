@@ -6,10 +6,10 @@ typedef struct
 	AstNode *node;
 } Parser;
 
-static void NewParseAstNode(Parser *, AstKind, const Token *);
-static void ParseExpression(Parser *);
-static void ParseBinaryExpression(Parser *, uint8_t parentPrecedence);
-static void ParsePrimaryExpression(Parser *);
+static AstNode *NewParseAstNode(Parser *, AstKind, const Token *);
+static AstNode *ParseExpression(Parser *);
+static AstNode *ParseBinaryExpression(Parser *, uint8_t parentPrecedence);
+static AstNode *ParsePrimaryExpression(Parser *);
 
 static uint8_t GetBinaryOperatorPrecedence(const Token *);
 static AstKind GetBinaryOperatorNode(const Token *);
@@ -24,23 +24,22 @@ AstNode *Parse(const Token *toks)
 
 	while (This->tok->Kind != TK_EndOfFile)
 	{
-		ParseExpression(This);
+		This->node = This->node->Next = ParseExpression(This);
 		Match(This, TK_Semicolon);
 	}
 
-	if (!defNode.Next)
-		NewParseAstNode(This, AST_Null, toks);
-	return defNode.Next;
+	if (defNode.Next)
+		return defNode.Next;
+	else
+		return NewParseAstNode(This, AST_Null, toks);
 }
 
-static void ParseExpression(Parser *This)
-{ ParseBinaryExpression(This, 0); }
+static AstNode *ParseExpression(Parser *This)
+{ return ParseBinaryExpression(This, 0); }
 
-static void ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
+static AstNode *ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 {
-	AstNode *base = This->node;
-	ParsePrimaryExpression(This);
-	AstNode *left = base->Next;
+	AstNode *left = ParsePrimaryExpression(This);
 
 	while (true)
 	{
@@ -48,30 +47,25 @@ static void ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 		uint8_t precedence = GetBinaryOperatorPrecedence(opTok);
 		if (!precedence || parentPrecedence && precedence >= parentPrecedence)
 			break;
-		AstNode *op = This->node;
-		NewParseAstNode(This, GetBinaryOperatorNode(opTok), Next(This));
-		op = op->Next;
+		AstNode *op = NewParseAstNode(This, GetBinaryOperatorNode(opTok), Next(This));
+		AstNode *right = ParseBinaryExpression(This, precedence);
 
-		AstNode *right = This->node;
-		ParseBinaryExpression(This, precedence);
-		right = right->Next;
-
-		base->Next = op;
+		This->node->Next = op;
 		op->Next = left;
 		left->Next = right;
 	}
+
+	return left;
 }
 
-static void ParsePrimaryExpression(Parser *This)
+static AstNode *ParsePrimaryExpression(Parser *This)
 {
 	switch (This->tok->Kind)
 	{
 	case TK_Number:
-		NewParseAstNode(This, AST_Number, Next(This));
-		break;
+		return NewParseAstNode(This, AST_Number, Next(This));
 	default:
 		ErrorAt(This->tok, "Illegal expression");
-		break;
 	}
 }
 
@@ -92,10 +86,11 @@ static const Token *Match(Parser *This, TokenKind kind)
 	return null;
 }
 
-static void NewParseAstNode(Parser *This, AstKind kind, const Token *tok)
+static AstNode *NewParseAstNode(Parser *This, AstKind kind, const Token *tok)
 {
 	AstNode *node = NewAstNode(kind, tok, null);
-	This->node = This->node->Next = node;
+	//This->node = This->node->Next = node;
+	return node;
 }
 
 AstNode *NewAstNode(AstKind kind, const Token *tok, AstNode *next)
