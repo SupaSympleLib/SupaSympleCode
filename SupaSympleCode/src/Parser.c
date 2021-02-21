@@ -119,6 +119,7 @@ static uint8_t GetBinaryOperatorPrecedence(const Token *tok)
 	{
 	case TK_Star:
 	case TK_Slash:
+	case TK_Percent:
 		return 3;
 	case TK_Plus:
 	case TK_Minus:
@@ -140,6 +141,8 @@ static AstKind GetBinaryOperatorNode(const Token *tok)
 		return AST_Multiplication;
 	case TK_Slash:
 		return AST_Division;
+	case TK_Percent:
+		return AST_Modulo;
 	default:
 		ErrorAt(tok, "Internal error (Getting binary operator node on invalid token)");
 		return AST_Null;

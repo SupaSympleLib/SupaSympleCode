@@ -8,6 +8,7 @@ typedef enum
 	AST_Subtraction,
 	AST_Multiplication,
 	AST_Division,
+	AST_Modulo,
 
 	AST_Number,
 
@@ -22,6 +23,7 @@ static const char *const AstKindNames[AST_Last + 1] =
 	"SubtractionAst",
 	"MultiplicationAst",
 	"DivisionAst",
+	"ModuloAst",
 
 	"NumberAst",
 };

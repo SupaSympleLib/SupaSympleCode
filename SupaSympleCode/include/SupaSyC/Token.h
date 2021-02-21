@@ -12,8 +12,9 @@ typedef enum
 	TK_Minus,
 	TK_Star,
 	TK_Slash,
+	TK_Percent,
 
-	TK_Last = TK_Slash,
+	TK_Last = TK_Percent,
 } TokenKind;
 
 static const char *const TokenKindNames[TK_Last + 1] =
@@ -27,6 +28,7 @@ static const char *const TokenKindNames[TK_Last + 1] =
 	"MinusToken",
 	"StarToken",
 	"SlashToken",
+	"PercentToken",
 };
 
 typedef struct

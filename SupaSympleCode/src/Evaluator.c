@@ -13,6 +13,14 @@ static const AstNode *Next(Evaluator *This)
 	return ast;
 }
 
+#define BIN_OP(op)                              \
+	{                                           \
+		int32_t left = EvaluateInternal(This);  \
+		int32_t right = EvaluateInternal(This); \
+		                                        \
+		return left op right;                   \
+	}                                           \
+
 static int32_t EvaluateInternal(Evaluator *This)
 {
 	const AstNode *ast = Next(This);
@@ -25,33 +33,15 @@ static int32_t EvaluateInternal(Evaluator *This)
 		return strtol(ast->Token->Text, &end, 0);
 	}
 	case AST_Addition:
-	{
-		int32_t left = EvaluateInternal(This);
-		int32_t right = EvaluateInternal(This);
-
-		return left + right;
-	}
+		BIN_OP(+);
 	case AST_Subtraction:
-	{
-		int32_t left = EvaluateInternal(This);
-		int32_t right = EvaluateInternal(This);
-
-		return left - right;
-	}
+		BIN_OP(-);
 	case AST_Multiplication:
-	{
-		int32_t left = EvaluateInternal(This);
-		int32_t right = EvaluateInternal(This);
-
-		return left * right;
-	}
+		BIN_OP(*);
 	case AST_Division:
-	{
-		int32_t left = EvaluateInternal(This);
-		int32_t right = EvaluateInternal(This);
-
-		return left / right;
-	}
+		BIN_OP(/);
+	case AST_Modulo:
+		BIN_OP(%);
 	case AST_Null:
 		return null;
 	default:
