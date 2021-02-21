@@ -62,6 +62,8 @@ struct AstObject
 	bool IsVariable : 1;
 	const Token *Token;
 
+	const AstNode *Body; // Function Body
+
 	AstObject *Next;
 };
 
