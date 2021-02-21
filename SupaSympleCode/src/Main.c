@@ -21,7 +21,7 @@ int main()
 	AstNode *ast = Parse(token);
 	SetConsoleColor(ConsoleColor_Yellow);
 	printf("Ast from '%s':\n", file->Name);
-	PrintAst(ast, "");
+	PrintAst(ast);
 
 	PrintEval(ast);
 
@@ -51,6 +51,8 @@ static void PrintAst(const AstNode *ast)
 		printf("%s", ast->Next ? "|--" : "L--");
 		SetConsoleColor(ConsoleColor_Green);
 		PrintAstNode(ast);
+
+		ast = ast->Next;
 	}
 }
 
