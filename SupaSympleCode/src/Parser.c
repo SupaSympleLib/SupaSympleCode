@@ -40,7 +40,7 @@ static void ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 {
 	AstNode *base = This->node;
 	ParsePrimaryExpression(This);
-	AstNode *left = This->node;
+	AstNode *left = base->Next;
 
 	while (true)
 	{
@@ -48,17 +48,17 @@ static void ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 		uint8_t precedence = GetBinaryOperatorPrecedence(opTok);
 		if (!precedence || parentPrecedence && precedence >= parentPrecedence)
 			break;
-		NewParseAstNode(This, GetBinaryOperatorNode(opTok), Next(This));
 		AstNode *op = This->node;
+		NewParseAstNode(This, GetBinaryOperatorNode(opTok), Next(This));
+		op = op->Next;
 
+		AstNode *right = This->node;
 		ParseBinaryExpression(This, precedence);
-		AstNode *right = op->Next;
+		right = right->Next;
 
 		base->Next = op;
 		op->Next = left;
 		left->Next = right;
-
-		continue;
 	}
 }
 
