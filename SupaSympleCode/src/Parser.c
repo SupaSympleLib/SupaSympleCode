@@ -47,19 +47,19 @@ static AstNode *ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 		const Token *opTok = This->tok;
 		uint8_t precedence = GetBinaryOperatorPrecedence(opTok);
 		if (!precedence || parentPrecedence && precedence >= parentPrecedence)
-			break;
+		{
+			SetConsoleColor(ConsoleColor_DarkYellow);
+			assert(!left->Next);
+			return left;
+		}
 		AstNode *op = NewParseAstNode(This, GetBinaryOperatorNode(opTok), Next(This));
 		AstNode *right = ParseBinaryExpression(This, precedence);
 
 		base->Next = op;
 		op->Next = left;
-		base = left;
+		base = op;
 		left = left->Next = right;
 	}
-
-	SetConsoleColor(ConsoleColor_DarkYellow);
-	assert(!left->Next);
-	return left;
 }
 
 static AstNode *ParsePrimaryExpression(Parser *This)
