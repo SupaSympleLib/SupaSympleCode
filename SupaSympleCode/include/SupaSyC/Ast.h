@@ -55,7 +55,18 @@ struct AstNode
 	AstNode *Next;
 };
 
+typedef struct AstObject AstObject;
+struct AstObject
+{
+	bool IsFunction : 1;
+	bool IsVariable : 1;
+	const Token *Token;
+
+	AstObject *Next;
+};
+
 AstNode *NewAstNode(AstKind, const Token *token, AstNode* next);
-void DeleteAstNode(const AstNode *, bool deleteNext);
+AstObject *NewAstObject(bool isFunction, bool isVariable, const Token *token, AstObject *next);
 
 void PrintAstNode(const AstNode *);
+void PrintAstObject(const AstObject *);

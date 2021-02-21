@@ -4,6 +4,8 @@ typedef struct
 {
 	const Token *tok;
 	AstNode *node;
+	AstObject *obj;
+	AstObject *objLast;
 } Parser;
 
 static AstNode *ParseStatement(Parser *, bool matchSemicolon);
@@ -25,10 +27,11 @@ static AstKind GetBinaryOperatorNode(const Token *);
 static const Token *Next(Parser *);
 static const Token *Match(Parser *, TokenKind kind);
 
-AstNode *Parse(const Token *toks)
+AstObject *Parse(const Token *toks)
 {
 	AstNode defNode = (AstNode) { .Next = null };
-	Parser *This = &(Parser) { toks, &defNode };
+	AstObject obj = (AstObject) { .Next = null };
+	Parser *This = &(Parser) { toks, &defNode, &obj, &obj };
 
 	while (This->tok->Kind != TK_EndOfFile)
 	{
@@ -41,6 +44,11 @@ AstNode *Parse(const Token *toks)
 		return defNode.Next;
 	else
 		return NewAstNode(AST_Null, toks, null);
+	
+	if (obj.Next)
+		return obj.Next;
+	else
+		return NewAstObject(false, true, toks, null);
 }
 
 
@@ -67,6 +75,9 @@ static AstNode *ParseVariableDeclaration(Parser *This)
 	Match(This, TK_VarKeyword);
 	const Token *name = Match(This, TK_Identifier);
 	
+	AstObject *obj = NewAstObject(false, true, name, null);
+	This->objLast = This->objLast->Next = obj;
+
 	AstNode *node = NewAstNode(AST_VariableDeclaration, name, null);
 	AstNode *init;
 	if (This->tok->Kind == TK_Equal)
@@ -122,7 +133,7 @@ static AstNode *ParsePrimaryExpression(Parser *This)
 	case TK_Number:
 		return NewAstNode(AST_Number, Next(This), null);
 	default:
-		ErrorAt(This->tok, "Illegal expression");
+		ErrorAt(This->tok, "Expected expression");
 	}
 }
 
@@ -166,20 +177,28 @@ AstNode *NewAstNode(AstKind kind, const Token *tok, AstNode *next)
 	return This;
 }
 
-void DeleteAstNode(const AstNode *This, bool delNext)
-{
-	if (!This)
-		return;
 
-	DeleteToken(This->Token, delNext);
-	if (delNext)
-		DeleteAstNode(This->Next, delNext);
-	Free(This);
+AstObject *NewAstObject(bool isFn, bool isVar, const Token *tok, AstObject *next)
+{
+	AstObject *This = Alloc(1, AstObject);
+	This->IsFunction = isFn;
+	This->IsVariable = isVar;
+	This->Token = tok;
+	This->Next = next;
+
+	return This;
 }
+
 
 void PrintAstNode(const AstNode *This)
 {
 	printf("%-24s -> ", AstKindNames[This->Kind]);
+	PrintToken(This->Token);
+}
+
+void PrintAstObject(const AstObject *This)
+{
+	printf("%s %.*s -> ", This->IsFunction ? "func" : "var ", This->Token->Length, This->Token->Text);
 	PrintToken(This->Token);
 }
 

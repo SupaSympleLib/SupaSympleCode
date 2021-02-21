@@ -54,7 +54,7 @@ static int32_t EvaluateInternal(Evaluator *This)
 	case AST_Modulo:
 		BIN_OP(%);
 	case AST_VariableDeclaration:
-		return EvaluateInternal(This);
+		return EvaluateInternal(This); // Return the initializer
 	case AST_Null:
 		return null;
 	default:
