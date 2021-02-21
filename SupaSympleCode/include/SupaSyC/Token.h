@@ -7,8 +7,7 @@ typedef enum
 	TK_Number,
 	TK_Identifier,
 
-	TK_Punctuation, // Used to mark start of punctuations
-	TK_Plus = TK_Punctuation,
+	TK_Plus,
 	TK_Minus,
 	TK_Star,
 	TK_Slash,
@@ -16,7 +15,8 @@ typedef enum
 
 	TK_Semicolon,
 
-	TK_Last = TK_Semicolon,
+	TK_Punctuation = TK_Plus, // Used to mark start of punctuations
+	TK_Last = TK_Semicolon,   // Last enum value
 } TokenKind;
 
 static const char *const TokenKindNames[TK_Last + 1] =
