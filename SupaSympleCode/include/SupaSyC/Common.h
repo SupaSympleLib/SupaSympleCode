@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
@@ -16,6 +17,9 @@
 #include "SupaSyC/Evaluator.h"
 
 bool StringStartsWith(const char *string, const char *start);
+
+__declspec(noreturn) void Error(const char *fmt, ...);
+__declspec(noreturn) void ErrorAt(const Token *, const char *fmt, ...);
 
 Token* Lex(const File* file);
 AstNode* Parse(const Token* tokens);

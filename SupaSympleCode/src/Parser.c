@@ -11,8 +11,8 @@ static void ParseExpression(Parser *);
 static void ParseBinaryExpression(Parser *, uint8_t parentPrecedence);
 static void ParsePrimaryExpression(Parser *);
 
-static uint8_t GetBinaryOperatorPrecedence(TokenKind);
-static AstKind GetBinaryOperatorNode(TokenKind);
+static uint8_t GetBinaryOperatorPrecedence(const Token *);
+static AstKind GetBinaryOperatorNode(const Token *);
 
 static const Token *Next(Parser *);
 static const Token *Match(Parser *, TokenKind kind);
@@ -22,8 +22,11 @@ AstNode *Parse(const Token *toks)
 	AstNode defNode = (AstNode) { .Next = null };
 	Parser *This = &(Parser) { toks, &defNode };
 
-	ParseExpression(This);
+	if (toks->Kind != TK_EndOfFile)
+		ParseExpression(This);
 
+	if (!defNode.Next)
+		NewParseAstNode(This, AST_Null, toks);
 	return defNode.Next;
 }
 
@@ -39,10 +42,10 @@ static void ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 	while (true)
 	{
 		const Token *op = This->tok;
-		uint8_t precedence = GetBinaryOperatorPrecedence(op->Kind);
+		uint8_t precedence = GetBinaryOperatorPrecedence(op);
 		if (!precedence || parentPrecedence && precedence > parentPrecedence)
 			break;
-		NewParseAstNode(This, GetBinaryOperatorNode(op->Kind), Next(This));
+		NewParseAstNode(This, GetBinaryOperatorNode(op), Next(This));
 		base->Next = This->node;
 		This->node = This->node->Next = left;
 
@@ -56,6 +59,9 @@ static void ParsePrimaryExpression(Parser *This)
 	{
 	case TK_Number:
 		NewParseAstNode(This, AST_Number, Next(This));
+		break;
+	default:
+		ErrorAt(This->tok, "Illegal expression");
 		break;
 	}
 }
@@ -107,9 +113,9 @@ void PrintAstNode(const AstNode *This)
 }
 
 
-static uint8_t GetBinaryOperatorPrecedence(TokenKind kind)
+static uint8_t GetBinaryOperatorPrecedence(const Token *tok)
 {
-	switch (kind)
+	switch (tok->Kind)
 	{
 	case TK_Star:
 	case TK_Slash:
@@ -122,9 +128,9 @@ static uint8_t GetBinaryOperatorPrecedence(TokenKind kind)
 	}
 }
 
-static AstKind GetBinaryOperatorNode(TokenKind kind)
+static AstKind GetBinaryOperatorNode(const Token *tok)
 {
-	switch (kind)
+	switch (tok->Kind)
 	{
 	case TK_Plus:
 		return AST_Addition;
@@ -135,6 +141,7 @@ static AstKind GetBinaryOperatorNode(TokenKind kind)
 	case TK_Slash:
 		return AST_Division;
 	default:
+		ErrorAt(tok, "Internal error (Getting binary operator node on invalid token)");
 		return AST_Null;
 	}
 }

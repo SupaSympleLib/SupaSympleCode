@@ -110,7 +110,7 @@ static void ParsePunctuation(Lexer *This)
 		if (StringStartsWith(This->p, punctuations[i]))
 			punc = i;
 	if (punc == -1)
-		abort();
+		ErrorAt(&(Token) { .DisplayLine = This->disLn, .Column = This->col }, "Unkown token");
 
 	const char *beg = This->p;
 	This->p += strlen(punctuations[punc]);

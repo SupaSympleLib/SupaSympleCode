@@ -52,8 +52,10 @@ static int32_t EvaluateInternal(Evaluator *This)
 
 		return left / right;
 	}
+	case AST_Null:
+		return null;
 	default:
-		abort(); // Error
+		ErrorAt(ast->Token, "Expected expression");
 	}
 }
 
