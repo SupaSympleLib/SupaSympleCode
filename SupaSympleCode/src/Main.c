@@ -30,7 +30,8 @@ int main()
 		SetConsoleColor(ConsoleColor_Green);
 		printf("%i\n", eval);
 
-		ast = ast->Next;
+		if (!ast->Next)
+			break;
 	}
 
 	CloseFile(file);
