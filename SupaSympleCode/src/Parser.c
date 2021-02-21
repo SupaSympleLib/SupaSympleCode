@@ -37,11 +37,17 @@ AstNode *Parse(const Token *toks)
 static AstNode *ParseExpression(Parser *This)
 { return ParseBinaryExpression(This, 0); }
 
+static AstNode *NewBinary(const Token *opTok, const AstNode *leftStart, AstNode *leftEnd, const AstNode *right)
+{
+	AstNode *ast = NewAstNode(GetBinaryOperatorNode(opTok), opTok, leftStart);
+	leftEnd->Next = right;
+	return ast;
+}
+
 static AstNode *ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 {
-	AstNode *base = This->node;
-	AstNode *left = ParsePrimaryExpression(This);
-	base->Next = left;
+	AstNode *left = This->node->Next = ParsePrimaryExpression(This);
+	AstNode *leftEnd = left;
 
 	while (true)
 	{
@@ -50,16 +56,14 @@ static AstNode *ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 		if (!precedence || parentPrecedence && precedence >= parentPrecedence)
 		{
 			SetConsoleColor(ConsoleColor_DarkYellow);
-			while (left->Next)
-				left = left->Next;
-			return left;
+			assert(!leftEnd->Next);
+			return leftEnd;
 		}
-		AstNode *op = NewParseAstNode(This, GetBinaryOperatorNode(opTok), Next(This));
+		Next(This);
 		AstNode *right = ParseBinaryExpression(This, precedence);
 		
-		base->Next = op;
-		op->Next = right;
-		right->Next = left;
+		left = NewBinary(opTok, left, leftEnd, right);
+		leftEnd = right;
 	}
 }
 
