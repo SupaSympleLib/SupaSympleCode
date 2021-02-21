@@ -13,13 +13,20 @@ static const AstNode *Next(Evaluator *This)
 	return ast;
 }
 
-#define BIN_OP(op)                              \
-	{                                           \
-		int32_t left = EvaluateInternal(This);  \
-		int32_t right = EvaluateInternal(This); \
-		                                        \
-		return left op right;                   \
-	}                                           \
+#define UN_OP(op)                                 \
+	{                                             \
+		int32_t operand = EvaluateInternal(This); \
+		                                          \
+		return op operand;                        \
+	}                                             \
+
+#define BIN_OP(op)                                \
+	{                                             \
+		int32_t left = EvaluateInternal(This);    \
+		int32_t right = EvaluateInternal(This);   \
+		                                          \
+		return left op right;                     \
+	}                                             \
 
 static int32_t EvaluateInternal(Evaluator *This)
 {
@@ -32,6 +39,10 @@ static int32_t EvaluateInternal(Evaluator *This)
 		const char *end = ast->Token->Text + ast->Token->Length;
 		return strtol(ast->Token->Text, &end, 0);
 	}
+	case AST_Positive:
+		UN_OP(+);
+	case AST_Negative:
+		UN_OP(-);
 	case AST_Addition:
 		BIN_OP(+);
 	case AST_Subtraction:

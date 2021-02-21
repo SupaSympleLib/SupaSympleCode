@@ -6,11 +6,16 @@ typedef struct
 	AstNode *node;
 } Parser;
 
-static AstNode *NewParseAstNode(Parser *, AstKind, const Token *);
 static AstNode *ParseExpression(Parser *);
+static AstNode *ParseUnaryExpression(Parser *, uint8_t parentPrecedence);
 static AstNode *ParseBinaryExpression(Parser *, uint8_t parentPrecedence);
 static AstNode *ParsePrimaryExpression(Parser *);
 
+static AstNode *NewUnaryAst(const Token *opertorToken, AstNode *operand);
+static AstNode *NewBinaryAst(const Token *opertorToken, AstNode *left, const AstNode *right);
+
+static uint8_t GetUnaryOperatorPrecedence(const Token *);
+static AstKind GetUnaryOperatorNode(const Token *);
 static uint8_t GetBinaryOperatorPrecedence(const Token *);
 static AstKind GetBinaryOperatorNode(const Token *);
 
@@ -33,24 +38,29 @@ AstNode *Parse(const Token *toks)
 	if (defNode.Next)
 		return defNode.Next;
 	else
-		return NewParseAstNode(This, AST_Null, toks);
+		return NewAstNode(AST_Null, toks, null);
 }
 
 static AstNode *ParseExpression(Parser *This)
 { return ParseBinaryExpression(This, 0); }
 
-static AstNode *NewBinary(const Token *opTok, AstNode *left, const AstNode *right)
+static AstNode *ParseUnaryExpression(Parser *This, uint8_t parentPrecedence)
 {
-	AstNode *ast = NewAstNode(GetBinaryOperatorNode(opTok), opTok, left);
-	while (left->Next)
-		left = left->Next;
-	left->Next = right;
-	return ast;
+	const Token *opTok = This->tok;
+	uint32_t precedence = GetUnaryOperatorPrecedence(opTok);
+	if (precedence && (!parentPrecedence || precedence <= parentPrecedence))
+	{
+		Next(This); // Skip operator token
+		AstNode *operand = ParseBinaryExpression(This, precedence);
+		return NewUnaryAst(opTok, operand);
+	}
+	else
+		return ParsePrimaryExpression(This);
 }
 
 static AstNode *ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 {
-	AstNode *left = ParsePrimaryExpression(This);
+	AstNode *left = ParseUnaryExpression(This, parentPrecedence);
 
 	while (true)
 	{
@@ -61,10 +71,10 @@ static AstNode *ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 			SetConsoleColor(ConsoleColor_DarkYellow);
 			return left;
 		}
-		Next(This);
-		AstNode *right = ParseBinaryExpression(This, precedence);
+		Next(This); // Skip operator token
+		AstNode *right = ParseUnaryExpression(This, precedence);
 		
-		left = NewBinary(opTok, left, right);
+		left = NewBinaryAst(opTok, left, right);
 	}
 }
 
@@ -73,10 +83,23 @@ static AstNode *ParsePrimaryExpression(Parser *This)
 	switch (This->tok->Kind)
 	{
 	case TK_Number:
-		return NewParseAstNode(This, AST_Number, Next(This));
+		return NewAstNode(AST_Number, Next(This), null);
 	default:
 		ErrorAt(This->tok, "Illegal expression");
 	}
+}
+
+
+static AstNode *NewUnaryAst(const Token *opTok, AstNode *operand)
+{ return NewAstNode(GetUnaryOperatorNode(opTok), opTok, operand); }
+
+static AstNode *NewBinaryAst(const Token *opTok, AstNode *left, const AstNode *right)
+{
+	AstNode *ast = NewAstNode(GetBinaryOperatorNode(opTok), opTok, left);
+	while (left->Next)
+		left = left->Next;
+	left->Next = right;
+	return ast;
 }
 
 
@@ -94,13 +117,6 @@ static const Token *Match(Parser *This, TokenKind kind)
 		return Next(This);
 	ErrorAt(This->tok, "Unexpected %s '%.*s', expected %s", TokenKindNames[This->tok->Kind], This->tok->Length, This->tok->Text, TokenKindNames[kind]);
 	return null;
-}
-
-static AstNode *NewParseAstNode(Parser *This, AstKind kind, const Token *tok)
-{
-	AstNode *node = NewAstNode(kind, tok, null);
-	//This->node = This->node->Next = node;
-	return node;
 }
 
 AstNode *NewAstNode(AstKind kind, const Token *tok, AstNode *next)
@@ -130,6 +146,32 @@ void PrintAstNode(const AstNode *This)
 	PrintToken(This->Token);
 }
 
+
+static uint8_t GetUnaryOperatorPrecedence(const Token *tok)
+{
+	switch (tok->Kind)
+	{
+	case TK_Plus:
+	case TK_Minus:
+		return 2;
+	default:
+		return 0;
+	}
+}
+
+static AstKind GetUnaryOperatorNode(const Token *tok)
+{
+	switch (tok->Kind)
+	{
+	case TK_Plus:
+		return AST_Positive;
+	case TK_Minus:
+		return AST_Negative;
+	default:
+		ErrorAt(tok, "Internal error (Getting unary operator node on invalid token)");
+		return AST_Null;
+	}
+}
 
 static uint8_t GetBinaryOperatorPrecedence(const Token *tok)
 {

@@ -4,6 +4,9 @@ typedef enum
 {
 	AST_Null,
 
+	AST_Positive, // Unused I suppose...
+	AST_Negative,
+
 	AST_Addition,
 	AST_Subtraction,
 	AST_Multiplication,
@@ -18,6 +21,9 @@ typedef enum
 static const char *const AstKindNames[AST_Last + 1] =
 {
 	"NullAst",
+
+	"PositiveAst",
+	"NegativeAst",
 
 	"AdditionAst",
 	"SubtractionAst",
