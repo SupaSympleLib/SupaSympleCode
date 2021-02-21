@@ -39,11 +39,6 @@ AstObject *Parse(const Token *toks)
 		while (This->node->Next)
 			This->node = This->node->Next;
 	}
-
-	if (defNode.Next)
-		return defNode.Next;
-	else
-		return NewAstNode(AST_Null, toks, null);
 	
 	if (obj.Next)
 		return obj.Next;

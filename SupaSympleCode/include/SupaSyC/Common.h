@@ -21,8 +21,8 @@ bool StringStartsWith(const char *string, const char *start);
 __declspec(noreturn) void Error(const char *fmt, ...);
 __declspec(noreturn) void ErrorAt(const Token *, const char *fmt, ...);
 
-Token* Lex(const File* file);
-AstNode* Parse(const Token* tokens);
+Token *Lex(const File *file);
+AstObject *Parse(const Token *tokens);
 
 #define Alloc(count, ty) (ty*)_Alloc(count, sizeof(ty))
 #define Free(ptr) free((void*)ptr)
