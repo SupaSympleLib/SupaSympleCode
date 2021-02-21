@@ -24,7 +24,7 @@ AstNode *Parse(const Token *toks)
 
 	while (This->tok->Kind != TK_EndOfFile)
 	{
-		This->node = This->node->Next = ParseExpression(This);
+		This->node = ParseExpression(This);
 		Match(This, TK_Semicolon);
 	}
 
@@ -53,10 +53,13 @@ static AstNode *ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 
 		base->Next = op;
 		op->Next = left;
-		left->Next = right;
+		base = left;
+		left = left->Next = right;
 	}
 
-	return base;
+	SetConsoleColor(ConsoleColor_DarkYellow);
+	assert(!left->Next);
+	return left;
 }
 
 static AstNode *ParsePrimaryExpression(Parser *This)
