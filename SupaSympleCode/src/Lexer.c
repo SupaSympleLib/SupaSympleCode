@@ -16,6 +16,7 @@ static const char *Next(Lexer *);
 static void ParseNumber(Lexer *);
 static void ParseIdentifier(Lexer *);
 static void ParsePunctuation(Lexer *);
+static void ParseKeyword(Lexer *);
 static void NewLexToken(Lexer *This, TokenKind kind, const char *beg);
 
 static bool IsDigit(char c)
@@ -57,7 +58,7 @@ Token *Lex(const File *file)
 			// Skip two characters (Sizeof "//")
 			Next(This);
 			Next(This);
-			while (*This->p != '\n')
+			while ((*This->p != '\n') && *This->p)
 				Next(This);
 			continue;
 		}
@@ -69,7 +70,10 @@ Token *Lex(const File *file)
 			Next(This);
 			Next(This);
 			while (!StringStartsWith(This->p, "*/"))
-				Next(This);
+			{
+				if (!*Next(This))
+					ErrorAt(&(Token) { .DisplayLine = This->disLn, .Column = This->col }, "Unexpected end of line");
+			}
 			// Skip two characters (Sizeof "*/")
 			Next(This);
 			Next(This);
@@ -116,6 +120,10 @@ static void ParseNumber(Lexer *This)
 	NewLexToken(This, TK_Number, beg);
 }
 
+#define KEYWORD(key, word)                                \
+	else if (!strncmp(beg, #key, This->p - beg))          \
+		return NewLexToken(This, TK_##word##Keyword, beg) \
+
 static void ParseIdentifier(Lexer *This)
 {
 	const char *beg = This->p;
@@ -123,7 +131,11 @@ static void ParseIdentifier(Lexer *This)
 	while (IsIdentifier(*This->p))
 		Next(This);
 
-	NewLexToken(This, TK_Identifier, beg);
+	if (false); // Test if identifier is a keyword
+	KEYWORD(var, Var);
+
+	else
+		NewLexToken(This, TK_Identifier, beg);
 }
 
 static void ParsePunctuation(Lexer *This)

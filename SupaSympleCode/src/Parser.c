@@ -6,6 +6,9 @@ typedef struct
 	AstNode *node;
 } Parser;
 
+static AstNode *ParseStatement(Parser *, bool matchSemicolon);
+static AstNode *ParseVariableDeclaration(Parser *);
+
 static AstNode *ParseExpression(Parser *);
 static AstNode *ParseUnaryExpression(Parser *, uint8_t parentPrecedence);
 static AstNode *ParseBinaryExpression(Parser *, uint8_t parentPrecedence);
@@ -29,10 +32,9 @@ AstNode *Parse(const Token *toks)
 
 	while (This->tok->Kind != TK_EndOfFile)
 	{
-		This->node->Next = ParseExpression(This);
+		This->node->Next = ParseStatement(This, true);
 		while (This->node->Next)
 			This->node = This->node->Next;
-		Match(This, TK_Semicolon);
 	}
 
 	if (defNode.Next)
@@ -40,6 +42,34 @@ AstNode *Parse(const Token *toks)
 	else
 		return NewAstNode(AST_Null, toks, null);
 }
+
+
+static AstNode *ParseStatement(Parser *This, bool matchSemi)
+{
+	AstNode *stmt;
+	switch (This->tok->Kind)
+	{
+	case TK_VarKeyword:
+		stmt = ParseVariableDeclaration(This);
+		break;
+	default:
+		stmt = ParseExpression(This);
+		break;
+	}
+
+	if (matchSemi)
+		Match(This, TK_Semicolon);
+	return stmt;
+}
+
+static AstNode *ParseVariableDeclaration(Parser *This)
+{
+	Match(This, TK_VarKeyword);
+	const Token *name = Match(This, TK_Identifier);
+	
+	return NewAstNode(AST_VariableDeclaration, name, null);
+}
+
 
 static AstNode *ParseExpression(Parser *This)
 { return ParseBinaryExpression(This, 0); }
@@ -67,10 +97,7 @@ static AstNode *ParseBinaryExpression(Parser *This, uint8_t parentPrecedence)
 		const Token *opTok = This->tok;
 		uint8_t precedence = GetBinaryOperatorPrecedence(opTok);
 		if (!precedence || parentPrecedence && precedence >= parentPrecedence)
-		{
-			SetConsoleColor(ConsoleColor_DarkYellow);
 			return left;
-		}
 		Next(This); // Skip operator token
 		AstNode *right = ParseUnaryExpression(This, precedence);
 		

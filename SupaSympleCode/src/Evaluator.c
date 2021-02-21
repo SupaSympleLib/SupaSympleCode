@@ -54,6 +54,7 @@ static int32_t EvaluateInternal(Evaluator *This)
 	case AST_Modulo:
 		BIN_OP(%);
 	case AST_Null:
+	case AST_VariableDeclaration:
 		return null;
 	default:
 		ErrorAt(ast->Token, "Expected expression");

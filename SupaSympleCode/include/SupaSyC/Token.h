@@ -7,6 +7,7 @@ typedef enum
 	TK_Number,
 	TK_Identifier,
 
+
 	TK_Plus,
 	TK_Minus,
 	TK_Star,
@@ -15,8 +16,13 @@ typedef enum
 
 	TK_Semicolon,
 
-	TK_Punctuation = TK_Plus, // Used to mark start of punctuations
-	TK_Last = TK_Semicolon,   // Last enum value
+
+	TK_VarKeyword,
+
+
+	TK_Punctuation = TK_Plus,   // Start of punctuations
+	TK_Keyword = TK_VarKeyword, // Start of keywords
+	TK_Last = TK_VarKeyword,
 } TokenKind;
 
 static const char *const TokenKindNames[TK_Last + 1] =
@@ -26,6 +32,7 @@ static const char *const TokenKindNames[TK_Last + 1] =
 	"NumberToken",
 	"IdentifierToken",
 
+
 	"PlusToken",
 	"MinusToken",
 	"StarToken",
@@ -33,6 +40,9 @@ static const char *const TokenKindNames[TK_Last + 1] =
 	"PercentToken",
 
 	"SemicolonToken",
+
+
+	"VarKeyword",
 };
 
 typedef struct
