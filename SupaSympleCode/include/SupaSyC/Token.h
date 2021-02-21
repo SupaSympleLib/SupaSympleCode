@@ -14,7 +14,9 @@ typedef enum
 	TK_Slash,
 	TK_Percent,
 
-	TK_Last = TK_Percent,
+	TK_Semicolon,
+
+	TK_Last = TK_Semicolon,
 } TokenKind;
 
 static const char *const TokenKindNames[TK_Last + 1] =
@@ -29,6 +31,8 @@ static const char *const TokenKindNames[TK_Last + 1] =
 	"StarToken",
 	"SlashToken",
 	"PercentToken",
+
+	"SemicolonToken",
 };
 
 typedef struct

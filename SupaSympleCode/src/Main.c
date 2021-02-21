@@ -12,21 +12,26 @@ int main()
 	puts(file->Source);
 	putchar('\n');
 
+	Token *token = Lex(file);
 	SetConsoleColor(ConsoleColor_Yellow);
 	printf("Tokens from '%s':\n", file->Name);
-	Token *token = Lex(file);
 	PrintTokens(token);
 
+	AstNode *ast = Parse(token);
 	SetConsoleColor(ConsoleColor_Yellow);
 	printf("Ast from '%s':\n", file->Name);
-	AstNode *ast = Parse(token);
 	PrintAst(ast);
 
-	int32_t eval = Evaluate(ast);
-	SetConsoleColor(ConsoleColor_Yellow);
-	printf("Evaluation: ");
-	SetConsoleColor(ConsoleColor_Green);
-	printf("%i\n", eval);
+	while (ast)
+	{
+		int32_t eval = Evaluate(ast, &ast);
+		SetConsoleColor(ConsoleColor_Yellow);
+		printf("Evaluation (Line %i): ", ast->Token->DisplayLine);
+		SetConsoleColor(ConsoleColor_Green);
+		printf("%i\n", eval);
+
+		ast = ast->Next;
+	}
 
 	CloseFile(file);
 	getchar();

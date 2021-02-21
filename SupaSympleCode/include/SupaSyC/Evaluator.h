@@ -1,3 +1,3 @@
 #pragma once
 
-int32_t Evaluate(const AstNode *);
+int32_t Evaluate(const AstNode *, AstNode **);

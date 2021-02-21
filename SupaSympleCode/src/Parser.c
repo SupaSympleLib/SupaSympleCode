@@ -22,8 +22,11 @@ AstNode *Parse(const Token *toks)
 	AstNode defNode = (AstNode) { .Next = null };
 	Parser *This = &(Parser) { toks, &defNode };
 
-	if (toks->Kind != TK_EndOfFile)
+	while (This->tok->Kind != TK_EndOfFile)
+	{
 		ParseExpression(This);
+		Match(This, TK_Semicolon);
+	}
 
 	if (!defNode.Next)
 		NewParseAstNode(This, AST_Null, toks);
@@ -79,6 +82,7 @@ static const Token *Match(Parser *This, TokenKind kind)
 {
 	if (This->tok->Kind == kind)
 		return Next(This);
+	ErrorAt(This->tok, "Unexpected %s '%.*s', expected %s", TokenKindNames[This->tok->Kind], This->tok->Length, This->tok->Text, TokenKindNames[kind]);
 	return null;
 }
 

@@ -23,13 +23,12 @@ static bool IsDigit(char c)
 static bool IsIdentifier(char c)
 { return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_'; }
 static bool IsWhiteSpace(char c)
-{ return c == ' ' || c == '\t' || c == '\r' || c == 0xCC; }
+{ return c == ' ' || c == '\t' || c == '\r'; }
 
 Token *Lex(const File *file)
 {
 	Token defTok = { .Next = null };
-	Lexer lexObj = (Lexer) { file->Source, file, &defTok, (TokenTrivia) { false, false }, 0, 0 };
-	Lexer *This = &lexObj;
+	Lexer *This = &(Lexer) { file->Source, file, &defTok, (TokenTrivia) { false, false }, 1, 0, 1 };
 
 	This->triv = (TokenTrivia) { false, false };
 	while (*This->p)
@@ -62,6 +61,9 @@ Token *Lex(const File *file)
 			This->disLn++;
 			This->p++;
 			break;
+		case 0:
+			NewLexToken(This, TK_EndOfFile, This->p++);
+			goto Return;
 		default:
 			ParsePunctuation(This);
 			break;
@@ -69,6 +71,7 @@ Token *Lex(const File *file)
 	}
 
 	NewLexToken(This, TK_EndOfFile, This->p++);
+Return:
 	return defTok.Next;
 }
 
@@ -102,7 +105,8 @@ static void ParsePunctuation(Lexer *This)
 {
 	const char *const punctuations[] =
 	{
-		"+", "-", "*", "/", "%"
+		"+", "-", "*", "/", "%",
+		";"
 	};
 
 	uint32_t punc = -1;
@@ -113,7 +117,8 @@ static void ParsePunctuation(Lexer *This)
 		ErrorAt(&(Token) { .DisplayLine = This->disLn, .Column = This->col }, "Unkown token");
 
 	const char *beg = This->p;
-	This->p += strlen(punctuations[punc]);
+	for (uint32_t i = 0; i < strlen(punctuations[punc]); i++)
+		Next(This);
 	NewLexToken(This, TK_Punctuation + punc, beg);
 }
 

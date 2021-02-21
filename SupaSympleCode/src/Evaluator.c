@@ -49,8 +49,11 @@ static int32_t EvaluateInternal(Evaluator *This)
 	}
 }
 
-int32_t Evaluate(const AstNode *ast)
+int32_t Evaluate(const AstNode *ast, AstNode **astPtr)
 {
 	Evaluator *This = &(Evaluator) { ast };
-	return EvaluateInternal(This);
+	int32_t eval = EvaluateInternal(This);
+	if (astPtr)
+		*astPtr = This->ast;
+	return eval;
 }
