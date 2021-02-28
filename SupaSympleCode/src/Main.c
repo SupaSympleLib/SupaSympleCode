@@ -26,6 +26,9 @@ int main()
 	//PrintEval(ast);
 
 	CloseFile(file);
+
+	SetConsoleColor(ConsoleColor_Yellow);
+	puts("Compiled Succesfully!");
 	getchar();
 }
 

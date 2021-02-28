@@ -11,6 +11,7 @@ static AstObject *ParseMember(Parser *);
 static AstObject *ParseFunctionDeclaration(Parser *);
 
 static AstNode *ParseStatement(Parser *, bool matchSemicolon);
+static AstNode *ParseBlockStatement(Parser *);
 static AstNode *ParseVariableDeclaration(Parser *);
 
 static AstNode *ParseExpression(Parser *);
@@ -70,6 +71,10 @@ static AstNode *ParseStatement(Parser *this, bool matchSemi)
 	AstNode *stmt;
 	switch (this->tok->Kind)
 	{
+	case TK_OpenBrace:
+		stmt = ParseBlockStatement(this);
+		matchSemi = false;
+		break;
 	case TK_VarKeyword:
 		stmt = ParseVariableDeclaration(this);
 		break;
@@ -81,6 +86,28 @@ static AstNode *ParseStatement(Parser *this, bool matchSemi)
 	if (matchSemi)
 		Match(this, TK_Semicolon);
 	return stmt;
+}
+
+static AstNode *ParseBlockStatement(Parser *this)
+{
+	const Token *open = Match(this, TK_OpenBrace);
+	AstNode *block = NewAstNode(AST_Block, open, null);
+	AstNode *curr = block;
+
+	while (this->tok->Kind != TK_CloseBrace)
+	{
+		if (this->tok->Kind == TK_EndOfFile)
+			ErrorAt(this->tok, "Unexpected end of file");
+
+		curr->Next = ParseStatement(this, true);
+		while (curr->Next)
+			curr = curr->Next;
+	}
+
+	const Token *close = Next(this);
+	curr->Next = NewAstNode(AST_EndBlock, close, null);
+
+	return block;
 }
 
 static AstNode *ParseVariableDeclaration(Parser *this)
@@ -206,7 +233,7 @@ AstObject *NewAstObject(bool isFn, bool isVar, const Token *tok, const AstNode *
 
 void PrintAstNode(const AstNode *this)
 {
-	printf("%-24s -> ", AstKindNames[this->Kind]);
+	printf("%-20s -> ", AstKindNames[this->Kind]);
 	PrintToken(this->Token);
 }
 

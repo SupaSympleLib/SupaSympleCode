@@ -20,8 +20,8 @@ typedef enum
 
 	TK_OpenParen,
 	TK_CloseParen,
-	TK_OpenBace,
-	TK_CloseBace,
+	TK_OpenBrace,
+	TK_CloseBrace,
 
 
 	TK_VarKeyword,
@@ -50,6 +50,11 @@ static const char *const TokenKindNames[TK_Last + 1] =
 	"EqualToken",
 
 	"SemicolonToken",
+
+	"OpenParenToken",
+	"CloseParenToken",
+	"OpenBraceToken",
+	"CloseBraceToken",
 
 
 	"VarKeyword",

@@ -5,6 +5,8 @@ typedef enum
 	AST_Null,
 
 	// Statements
+	AST_Block,
+	AST_EndBlock,
 	AST_VariableDeclaration,
 
 	// Expressions / Operators
@@ -20,7 +22,7 @@ typedef enum
 	AST_Number,
 
 	// Flags
-	AST_Statement = AST_VariableDeclaration, // Start of statements
+	AST_Statement = AST_Block, // Start of statements
 	AST_Expression = AST_Positive,           // Start of expressions
 	AST_Last = AST_Number,
 } AstKind;
@@ -30,7 +32,9 @@ static const char *const AstKindNames[AST_Last + 1] =
 	"NullAst",
 
 
-	"VariableDeclarationAst",
+	"BlockAst",
+	"EndBlockAst",
+	"VarDeclAst",
 
 
 	"PositiveAst",
