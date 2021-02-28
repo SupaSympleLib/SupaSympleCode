@@ -17,7 +17,7 @@ static void ParseNumber(Lexer *);
 static void ParseIdentifier(Lexer *);
 static void ParsePunctuation(Lexer *);
 static void ParseKeyword(Lexer *);
-static void NewLexToken(Lexer *This, TokenKind kind, const char *beg);
+static void NewLexToken(Lexer *this, TokenKind kind, const char *beg);
 
 static bool IsDigit(char c)
 { return c >= '0' && c <= '9'; }
@@ -29,177 +29,179 @@ static bool IsWhiteSpace(char c)
 Token *Lex(const File *file)
 {
 	Token defTok = { .Next = null };
-	Lexer *This = &(Lexer) { file->Source, file, &defTok, (TokenTrivia) { false, false }, 1, 0, 1 };
+	Lexer *this = &(Lexer) { file->Source, file, &defTok, (TokenTrivia) { false, false }, 1, 0, 1 };
 
-	This->triv = (TokenTrivia) { false, false };
-	while (*This->p)
+	this->triv = (TokenTrivia) { false, false };
+	while (*this->p)
 	{
-		while (IsWhiteSpace(*This->p))
+		while (IsWhiteSpace(*this->p))
 		{
-			This->triv.AfterSpace = true;
-			Next(This);
+			this->triv.AfterSpace = true;
+			Next(this);
 		}
 
-		if (IsDigit(*This->p))
+		if (IsDigit(*this->p))
 		{
-			ParseNumber(This);
+			ParseNumber(this);
 			continue;
 		}
 
-		if (IsIdentifier(*This->p))
+		if (IsIdentifier(*this->p))
 		{
-			ParseIdentifier(This);
+			ParseIdentifier(this);
 			continue;
 		}
 
 		// Single line comment
-		if (StringStartsWith(This->p, "//"))
+		if (StringStartsWith(this->p, "//"))
 		{
 			// Skip two characters (Sizeof "//")
-			Next(This);
-			Next(This);
-			while ((*This->p != '\n') && *This->p)
-				Next(This);
+			Next(this);
+			Next(this);
+			while ((*this->p != '\n') && *this->p)
+				Next(this);
 			continue;
 		}
 
 		// Block comment
-		if (StringStartsWith(This->p, "/*"))
+		if (StringStartsWith(this->p, "/*"))
 		{
 			// Skip two characters (Sizeof "/*")
-			Next(This);
-			Next(This);
-			while (!StringStartsWith(This->p, "*/"))
+			Next(this);
+			Next(this);
+			while (!StringStartsWith(this->p, "*/"))
 			{
-				if (!*Next(This))
-					ErrorAt(&(Token) { .DisplayLine = This->disLn, .Column = This->col }, "Unexpected end of line");
+				if (!*Next(this))
+					ErrorAt(&(Token) { .DisplayLine = this->disLn, .Column = this->col }, "Unexpected end of line");
 			}
 			// Skip two characters (Sizeof "*/")
-			Next(This);
-			Next(This);
+			Next(this);
+			Next(this);
 			continue;
 		}
 
-		switch (*This->p)
+		switch (*this->p)
 		{
 		case '\n':
-			This->triv.StartOfLine = true;
-			This->triv.AfterSpace = false;
-			This->ln++;
-			This->col = 0;
-			This->disLn++;
-			This->p++;
+			this->triv.StartOfLine = true;
+			this->triv.AfterSpace = false;
+			this->ln++;
+			this->col = 0;
+			this->disLn++;
+			this->p++;
 			break;
 		case 0:
-			NewLexToken(This, TK_EndOfFile, This->p++);
+			NewLexToken(this, TK_EndOfFile, this->p++);
 			goto Return;
 		default:
-			ParsePunctuation(This);
+			ParsePunctuation(this);
 			break;
 		}
 	}
 
-	NewLexToken(This, TK_EndOfFile, This->p++);
+	NewLexToken(this, TK_EndOfFile, this->p++);
 Return:
 	return defTok.Next;
 }
 
-static const char *Next(Lexer *This)
+static const char *Next(Lexer *this)
 {
-	This->col++;
-	return This->p++;
+	this->col++;
+	return this->p++;
 }
 
-static void ParseNumber(Lexer *This)
+static void ParseNumber(Lexer *this)
 {
-	const char *beg = This->p;
-	Next(This);
-	while (IsDigit(*This->p))
-		Next(This);
+	const char *beg = this->p;
+	Next(this);
+	while (IsDigit(*this->p))
+		Next(this);
 
-	NewLexToken(This, TK_Number, beg);
+	NewLexToken(this, TK_Number, beg);
 }
 
 #define KEYWORD(key, word)                                \
-	else if (!strncmp(beg, #key, This->p - beg))          \
-		return NewLexToken(This, TK_##word##Keyword, beg) \
+	else if (!strncmp(beg, #key, this->p - beg))          \
+		return NewLexToken(this, TK_##word##Keyword, beg) \
 
-static void ParseIdentifier(Lexer *This)
+static void ParseIdentifier(Lexer *this)
 {
-	const char *beg = This->p;
-	Next(This);
-	while (IsIdentifier(*This->p))
-		Next(This);
+	const char *beg = this->p;
+	Next(this);
+	while (IsIdentifier(*this->p))
+		Next(this);
 
 	if (false); // Test if identifier is a keyword
 	KEYWORD(var, Var);
+	KEYWORD(func, Func);
 
 	else
-		NewLexToken(This, TK_Identifier, beg);
+		NewLexToken(this, TK_Identifier, beg);
 }
 
-static void ParsePunctuation(Lexer *This)
+static void ParsePunctuation(Lexer *this)
 {
 	const char *const punctuations[] =
 	{
 		"+", "-", "*", "/", "%",
 		"=",
 		";",
+		"(", ")", "{", "}",
 	};
 
 	uint32_t punc = -1;
 	for (uint32_t i = 0; i < sizeof(punctuations) / sizeof(*punctuations); i++)
-		if (StringStartsWith(This->p, punctuations[i]))
+		if (StringStartsWith(this->p, punctuations[i]))
 			punc = i;
 	if (punc == -1)
-		ErrorAt(&(Token) { .DisplayLine = This->disLn, .Column = This->col }, "Unkown token");
+		ErrorAt(&(Token) { .DisplayLine = this->disLn, .Column = this->col }, "Unkown token");
 
-	const char *beg = This->p;
+	const char *beg = this->p;
 	for (uint32_t i = 0; i < strlen(punctuations[punc]); i++)
-		Next(This);
-	NewLexToken(This, TK_Punctuation + punc, beg);
+		Next(this);
+	NewLexToken(this, TK_Punctuation + punc, beg);
 }
 
 
-static void NewLexToken(Lexer *This, TokenKind kind, const char *beg)
+static void NewLexToken(Lexer *this, TokenKind kind, const char *beg)
 {
-	uint32_t len = This->p - beg;
-	Token *tok = NewToken(kind, beg, len, This->file, This->ln, This->col - len + 1, This->disLn, This->triv, null);
-	This->tok->Next = tok;
-	This->tok = tok;
+	uint32_t len = this->p - beg;
+	Token *tok = NewToken(kind, beg, len, this->file, this->ln, this->col - len + 1, this->disLn, this->triv, null);
+	this->tok->Next = tok;
+	this->tok = tok;
 }
 
 Token *NewToken(TokenKind kind, const char *text, uint32_t len, const File *file, uint32_t ln, uint32_t col, uint32_t disLn, TokenTrivia trivia, Token *next)
 {
-	Token *This = Alloc(1, Token);
-	This->Kind = kind;
-	This->Text = text;
-	This->Length = len;
-	This->File = file;
+	Token *this = Alloc(1, Token);
+	this->Kind = kind;
+	this->Text = text;
+	this->Length = len;
+	this->File = file;
 
-	This->Line = ln;
-	This->Column = col;
-	This->DisplayLine = disLn;
-	This->Trivia = trivia;
+	this->Line = ln;
+	this->Column = col;
+	this->DisplayLine = disLn;
+	this->Trivia = trivia;
 
-	This->Next = next;
+	this->Next = next;
 
-	return This;
+	return this;
 }
 
-void DeleteToken(const Token *This, bool delNext)
+void DeleteToken(const Token *this, bool delNext)
 {
-	if (!This)
+	if (!this)
 		return;
 
 	if (delNext)
-		DeleteToken(This->Next, delNext);
-	Free(This);
+		DeleteToken(this->Next, delNext);
+	Free(this);
 }
 
 
-void PrintToken(const Token *This)
+void PrintToken(const Token *this)
 {
 	SetConsoleColor(ConsoleColor_Green);
-	printf("%-16s '%1.*s' (%u:%u)\n", TokenKindNames[This->Kind], This->Length, This->Text, This->DisplayLine, This->Column);
+	printf("%-16s '%1.*s' (%u:%u)\n", TokenKindNames[this->Kind], this->Length, this->Text, this->DisplayLine, this->Column);
 }

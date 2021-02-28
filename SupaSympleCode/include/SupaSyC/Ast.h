@@ -68,7 +68,7 @@ struct AstObject
 };
 
 AstNode *NewAstNode(AstKind, const Token *token, AstNode* next);
-AstObject *NewAstObject(bool isFunction, bool isVariable, const Token *token, AstObject *next);
+AstObject *NewAstObject(bool isFunction, bool isVariable, const Token *token, const AstNode *body, AstObject *next);
 
 void PrintAstNode(const AstNode *);
 void PrintAstObject(const AstObject *);

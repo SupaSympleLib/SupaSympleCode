@@ -1,3 +1,2 @@
-// Next step, variables
-// First define a variable:
-var myVar = 5; // Right now the only type is 'int' (Since we are using an evaluator)
+func MyFunc
+	5 - 4;

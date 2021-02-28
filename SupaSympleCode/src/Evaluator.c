@@ -5,32 +5,32 @@ typedef struct
 	const AstNode *ast;
 } Evaluator;
 
-static const AstNode *Next(Evaluator *This)
+static const AstNode *Next(Evaluator *this)
 {
-	const AstNode *ast = This->ast;
-	if (This->ast->Next)
-		This->ast = This->ast->Next;
+	const AstNode *ast = this->ast;
+	if (this->ast->Next)
+		this->ast = this->ast->Next;
 	return ast;
 }
 
 #define UN_OP(op)                                 \
 	{                                             \
-		int32_t operand = EvaluateInternal(This); \
+		int32_t operand = EvaluateInternal(this); \
 		                                          \
 		return op operand;                        \
 	}                                             \
 
 #define BIN_OP(op)                                \
 	{                                             \
-		int32_t left = EvaluateInternal(This);    \
-		int32_t right = EvaluateInternal(This);   \
+		int32_t left = EvaluateInternal(this);    \
+		int32_t right = EvaluateInternal(this);   \
 		                                          \
 		return left op right;                     \
 	}                                             \
 
-static int32_t EvaluateInternal(Evaluator *This)
+static int32_t EvaluateInternal(Evaluator *this)
 {
-	const AstNode *ast = Next(This);
+	const AstNode *ast = Next(this);
 
 	switch (ast->Kind)
 	{
@@ -54,7 +54,7 @@ static int32_t EvaluateInternal(Evaluator *This)
 	case AST_Modulo:
 		BIN_OP(%);
 	case AST_VariableDeclaration:
-		return EvaluateInternal(This); // Return the initializer
+		return EvaluateInternal(this); // Return the initializer
 	case AST_Null:
 		return null;
 	default:
@@ -64,9 +64,9 @@ static int32_t EvaluateInternal(Evaluator *This)
 
 int32_t Evaluate(const AstNode *ast, AstNode **astPtr)
 {
-	Evaluator *This = &(Evaluator) { ast };
-	int32_t eval = EvaluateInternal(This);
+	Evaluator *this = &(Evaluator) { ast };
+	int32_t eval = EvaluateInternal(this);
 	if (astPtr)
-		*astPtr = This->ast;
+		*astPtr = this->ast;
 	return eval;
 }
