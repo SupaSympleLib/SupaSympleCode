@@ -6,4 +6,4 @@ cmake_minimum_required (VERSION 3.8)
 project("MegaSympleCode")
 
 # Add source to this project's executable.
-add_executable(MegaSympleCode "MegaSympleCode.c" )
+add_executable(MegaSympleCode "MegaSympleCode.c"  "Common.h" "Lexer.c")
