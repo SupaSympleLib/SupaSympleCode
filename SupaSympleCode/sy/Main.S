@@ -1,0 +1,2 @@
+.global  MyFunc
+MyFunc:

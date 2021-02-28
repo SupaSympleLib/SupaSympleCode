@@ -15,6 +15,7 @@
 #include "SupaSyC/Token.h"
 #include "SupaSyC/Ast.h"
 #include "SupaSyC/Evaluator.h"
+#include "SupaSyC/Emitter.h"
 
 bool StringStartsWith(const char *string, const char *start);
 

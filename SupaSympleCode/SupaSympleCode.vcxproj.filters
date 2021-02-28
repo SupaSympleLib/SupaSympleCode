@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Main.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\File.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -34,6 +31,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Evaluator.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Emitter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,8 +59,12 @@
     <ClInclude Include="include\SupaSyC\Evaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\SupaSyC\Emitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="sy\Main.sy" />
+    <None Include="sy\Main.S" />
   </ItemGroup>
 </Project>

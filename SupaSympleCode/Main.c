@@ -25,6 +25,10 @@ int main()
 
 	//PrintEval(ast);
 
+	File *out = OpenFile("sy/Main.S", FILEMODE_READ_WRITE);
+	Emit(out, ast);
+
+	CloseFile(out);
 	CloseFile(file);
 
 	SetConsoleColor(ConsoleColor_Yellow);

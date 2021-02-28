@@ -230,6 +230,9 @@ AstObject *NewAstObject(bool isFn, bool isVar, const Token *tok, const AstNode *
 	return this;
 }
 
+bool AstIsExpr(const AstNode *this)
+{ return this->Kind >= AST_Expression || this->Kind <= AST_ExpressionLast; }
+
 
 void PrintAstNode(const AstNode *this)
 {

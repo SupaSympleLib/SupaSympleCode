@@ -23,7 +23,8 @@ typedef enum
 
 	// Flags
 	AST_Statement = AST_Block, // Start of statements
-	AST_Expression = AST_Positive,           // Start of expressions
+	AST_Expression = AST_Positive, // Start of expressions
+	AST_ExpressionLast = AST_Number, // Start of expressions
 	AST_Last = AST_Number,
 } AstKind;
 
@@ -73,6 +74,8 @@ struct AstObject
 
 AstNode *NewAstNode(AstKind, const Token *token, AstNode* next);
 AstObject *NewAstObject(bool isFunction, bool isVariable, const Token *token, const AstNode *body, AstObject *next);
+
+bool AstIsExpr(const AstNode *);
 
 void PrintAstNode(const AstNode *);
 void PrintAstObject(const AstObject *);
