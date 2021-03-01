@@ -181,12 +181,12 @@ static AstNode *ParsePrimaryExpression(Parser *this)
 static AstNode *NewUnaryAst(const Token *opTok, AstNode *operand)
 { return NewAstNode(GetUnaryOperatorNode(opTok), opTok, operand); }
 
-static AstNode *NewBinaryAst(const Token *opTok, AstNode *left, const AstNode *right)
+static AstNode *NewBinaryAst(const Token *opTok, const AstNode *left, AstNode *right)
 {
-	AstNode *ast = NewAstNode(GetBinaryOperatorNode(opTok), opTok, left);
-	while (left->Next)
-		left = left->Next;
-	left->Next = right;
+	AstNode *ast = NewAstNode(GetBinaryOperatorNode(opTok), opTok, right);
+	while (right->Next)
+		right = right->Next;
+	right->Next = left;
 	return ast;
 }
 

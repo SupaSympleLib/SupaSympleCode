@@ -13,9 +13,12 @@ static void EmitObj(Emitter *);
 static void EmitFunc(Emitter *);
 
 static void EmitStmt(Emitter *);
+static void EmitBlockStmt(Emitter *);
 
 static void EmitExpr(Emitter *);
 static void EmitBinExpr(Emitter *, const char *op);
+
+static const AstNode *Next(Emitter *);
 
 void Emit(File *file, const AstObject *ast)
 {
@@ -52,23 +55,60 @@ static void EmitStmt(Emitter *this)
 {
 	if (AstIsExpr(this->node))
 		EmitExpr(this);
+
+	switch (this->node->Kind)
+	{
+	case AST_Block:
+		EmitBlockStmt(this);
+		break;
+	}
+}
+
+static void EmitBlockStmt(Emitter *this)
+{
+	while (Next(this)->Kind != AST_EndBlock)
+		EmitStmt(this);
 }
 
 static void EmitExpr(Emitter *this)
 {
 	switch (this->node->Kind)
 	{
+	case AST_Number:
+	{
+		const Token *num = Next(this)->Token;
+		Emitf(this, "\tmov     $%.*s, %%eax", num->Length, num->Text);
+		break;
+	}
 	case AST_Addition:
 		EmitBinExpr(this, "add");
+		break;
+	case AST_Subtraction:
+		EmitBinExpr(this, "sub");
+		break;
+	case AST_Multiplication:
+		EmitBinExpr(this, "imul");
 		break;
 	}
 }
 
 static void EmitBinExpr(Emitter *this, const char *op)
 {
+	Next(this);
+
 	EmitExpr(this);
 	Emitf(this, "\tpush    %%eax");
 	EmitExpr(this);
-	Emitf(this, "\tpop     %%eax");
-	Emitf(this, "\t%-7.s %%edx, %%eax", op);
+	Emitf(this, "\tpop     %%edx");
+	Emitf(this, "\t%-7s %%edx, %%eax", op);
+	Emitf(this);
+}
+
+static const AstNode *Next(Emitter *this)
+{
+	const AstNode *node = this->node;
+	if (this->node->Next)
+		this->node = this->node->Next;
+
+	return node;
 }
