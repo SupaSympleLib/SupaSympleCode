@@ -31,8 +31,19 @@ int main()
 	CloseFile(out);
 	CloseFile(file);
 
-	SetConsoleColor(ConsoleColor_Yellow);
-	puts("Compiled Succesfully!");
+	SetConsoleColor(ConsoleColor_Reset);
+	int comp = system("clang -m32 sy/Main.S -o sy/Main.exe --debug");
+	if (!comp)
+	{
+		SetConsoleColor(ConsoleColor_Yellow);
+		puts("Starting program...");
+		SetConsoleColor(ConsoleColor_Reset);
+		int ec = system("sy\\Main.exe");
+		SetConsoleColor(ConsoleColor_Yellow);
+		printf("\nProgram exited with code %i (0x%x)\n", ec, ec);
+	}
+
+	//puts("Compiled Succesfully!");
 	getchar();
 }
 

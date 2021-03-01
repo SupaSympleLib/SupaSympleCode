@@ -1,10 +1,11 @@
-.global  MyFunc
-MyFunc:
+.global  _main
+_main:
 	mov     $9, %eax
 	push    %eax
 	mov     $6, %eax
 	pop     %edx
-	add     %edx, %eax
+	imul    %edx, %eax
 
-	mov     $2, %eax
-	mov     $2, %eax
+	mov     $6, %eax
+	mov     $6, %eax
+	ret

@@ -49,6 +49,8 @@ static void EmitFunc(Emitter *this)
 	do
 		EmitStmt(this);
 	while (body = body->Next);
+
+	Emitf(this, "\tret");
 }
 
 static void EmitStmt(Emitter *this)
@@ -66,7 +68,9 @@ static void EmitStmt(Emitter *this)
 
 static void EmitBlockStmt(Emitter *this)
 {
-	while (Next(this)->Kind != AST_EndBlock)
+	Next(this);
+
+	while (this->node->Kind != AST_EndBlock)
 		EmitStmt(this);
 }
 
@@ -88,6 +92,29 @@ static void EmitExpr(Emitter *this)
 		break;
 	case AST_Multiplication:
 		EmitBinExpr(this, "imul");
+		break;
+	case AST_Division:
+		Next(this);
+
+		EmitExpr(this);
+		Emitf(this, "\tpush    %%eax");
+		EmitExpr(this);
+		Emitf(this, "\tpop     %%ecx");
+		Emitf(this, "\tcltd");
+		Emitf(this, "\tidiv    %%ecx");
+		Emitf(this);
+		break;
+	case AST_Modulo:
+		Next(this);
+
+		EmitExpr(this);
+		Emitf(this, "\tpush    %%eax");
+		EmitExpr(this);
+		Emitf(this, "\tpop     %%ecx");
+		Emitf(this, "\tcltd");
+		Emitf(this, "\tidiv    %%ecx");
+		Emitf(this, "\tmov     %%edx, %%eax");
+		Emitf(this);
 		break;
 	}
 }
