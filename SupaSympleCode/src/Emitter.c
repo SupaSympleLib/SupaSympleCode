@@ -30,7 +30,6 @@ void Emit(File *file, const AstObject *ast)
 
 	Emitf(this, "_SSyc.print:");
 	Emitf(this, "\tsub $12, %%esp");
-	Emitf(this, "\tcvtss2sd %%xmm0, %%xmm0");
 	Emitf(this, "\tmovsd %%xmm0, 4(%%esp)");
 	Emitf(this, "\tmov $_SSyc.fmt, %%eax");
 	Emitf(this, "\tmov %%eax, (%%esp)");
@@ -63,8 +62,7 @@ static void EmitFunc(Emitter *this)
 	this->node = body;
 	EmitStmt(this);
 
-	Emitf(this, "\tmovss %%xmm0, -4(%%esp)");
-	Emitf(this, "\tmov -4(%%esp), %%eax");
+	Emitf(this, "\txor %%eax, %%eax");
 	Emitf(this, "\tret");
 }
 
@@ -104,12 +102,16 @@ static void EmitExpr(Emitter *this)
 		const Token *num = Next(this)->Token;
 		union
 		{
-			float fval;
-			int ival;
+			double dval;
+			struct
+			{
+				int ival1, ival2;
+			};
 		} val;
-		val.fval = strtof(num->Text, null);
-		Emitf(this, "\tmovl $0x%x, -4(%%esp) # %f", val.ival, val.fval);
-		Emitf(this, "\tmovss -4(%%esp), %%xmm0");
+		val.dval = strtod(num->Text, null);
+		Emitf(this, "\tmovl $0x%x, -8(%%esp) # double %f", val.ival1, val.dval);
+		Emitf(this, "\tmovl $0x%x, -4(%%esp) # double %f (second half)", val.ival2, val.dval);
+		Emitf(this, "\tmovsd -8(%%esp), %%xmm0");
 		break;
 	}
 	case AST_Addition:
@@ -125,7 +127,18 @@ static void EmitExpr(Emitter *this)
 		EmitBinExpr(this, "div");
 		break;
 	case AST_Modulo:
-		ErrorAt(this->node->Token, "Modulo is not supported!");
+		//ErrorAt(this->node->Token, "Modulo is not supported!");
+		Next(this);
+
+		EmitExpr(this);
+		Emitf(this, "\tsub $16, %%esp");
+		Emitf(this, "\tmovsd %%xmm0, 8(%%esp)");
+		EmitExpr(this);
+		Emitf(this, "\tmovsd %%xmm0, (%%esp)");
+		Emitf(this, "\tcall _fmod");
+		Emitf(this, "\tfstl (%%esp)");
+		Emitf(this, "\tmovsd (%%esp), %%xmm0");
+		Emitf(this, "\tadd $16, %%esp");
 		break;
 	}
 }
@@ -135,12 +148,12 @@ static void EmitBinExpr(Emitter *this, const char *op)
 	Next(this);
 
 	EmitExpr(this);
-	Emitf(this, "\tsub $4, %%esp");
-	Emitf(this, "\tmovss %%xmm0, (%%esp)");
+	Emitf(this, "\tsub $8, %%esp");
+	Emitf(this, "\tmovsd %%xmm0, (%%esp)");
 	EmitExpr(this);
-	Emitf(this, "\tmovss (%%esp), %%xmm1");
-	Emitf(this, "\tadd $4, %%esp");
-	Emitf(this, "\t%sss %%xmm1, %%xmm0", op);
+	Emitf(this, "\tmovsd (%%esp), %%xmm1");
+	Emitf(this, "\tadd $8, %%esp");
+	Emitf(this, "\t%ssd %%xmm1, %%xmm0", op);
 }
 
 static const AstNode *Next(Emitter *this)
