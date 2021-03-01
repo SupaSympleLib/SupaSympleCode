@@ -24,6 +24,19 @@ void Emit(File *file, const AstObject *ast)
 {
 	Emitter *this = &(Emitter) { file, ast };
 
+	Emitf(this, "_SSyc.fmt:");
+	Emitf(this, "\t.string \"Value: %%f\\n\"");
+	Emitf(this);
+
+	Emitf(this, "_SSyc.print:");
+	Emitf(this, "\tsub $8, %%esp");
+	Emitf(this, "\tmovss %%xmm0, 4(%%esp)");
+	Emitf(this, "\tmovl $_SSyc.fmt, (%%esp)");
+	Emitf(this, "\tcall _printf");
+	Emitf(this, "\tadd $8, %%esp");
+	Emitf(this, "\tret");
+	Emitf(this);
+
 	while (this->ast)
 		EmitObj(this);
 }
@@ -56,7 +69,16 @@ static void EmitFunc(Emitter *this)
 static void EmitStmt(Emitter *this)
 {
 	if (AstIsExpr(this->node))
+	{
 		EmitExpr(this);
+		//Emitf(this, "\tcall _SSyc.print");
+		Emitf(this, "\tsub $8, %%esp");
+		Emitf(this, "\tmovss %%xmm0, 4(%%esp)");
+		Emitf(this, "\tmovl $_SSyc.fmt, (%%esp)");
+		Emitf(this, "\tcall _printf");
+		Emitf(this, "\tadd $8, %%esp");
+		Emitf(this);
+	}
 
 	switch (this->node->Kind)
 	{
@@ -120,7 +142,6 @@ static void EmitBinExpr(Emitter *this, const char *op)
 	Emitf(this, "\tmovss (%%esp), %%xmm1");
 	Emitf(this, "\tadd $4, %%esp");
 	Emitf(this, "\t%sss %%xmm1, %%xmm0", op);
-	Emitf(this);
 }
 
 static const AstNode *Next(Emitter *this)

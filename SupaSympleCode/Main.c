@@ -32,7 +32,7 @@ int main()
 	CloseFile(file);
 
 	SetConsoleColor(ConsoleColor_Reset);
-	int comp = system("clang -m32 sy/Main.S -o sy/Main.exe --debug");
+	int comp = system("clang -m32 sy/Main.S -o sy/Main.exe --debug -l legacy_stdio_definitions");
 	if (!comp)
 	{
 		SetConsoleColor(ConsoleColor_Yellow);

@@ -21,11 +21,13 @@ typedef enum
 
 	AST_Number,
 
+	AST_Call,
+
 	// Flags
 	AST_Statement = AST_Block, // Start of statements
 	AST_Expression = AST_Positive, // Start of expressions
-	AST_ExpressionLast = AST_Number, // Start of expressions
-	AST_Last = AST_Number,
+	AST_ExpressionLast = AST_Call, // Start of expressions
+	AST_Last = AST_Call,
 } AstKind;
 
 static const char *const AstKindNames[AST_Last + 1] =
@@ -48,6 +50,8 @@ static const char *const AstKindNames[AST_Last + 1] =
 	"ModuloAst",
 
 	"NumberAst",
+
+	"CallAst",
 };
 
 
