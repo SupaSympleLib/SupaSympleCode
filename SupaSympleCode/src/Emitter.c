@@ -119,11 +119,13 @@ static void EmitExpr(Emitter *this)
 		EmitBinExpr(this, "sub");
 		break;
 	case AST_Multiplication:
-		EmitBinExpr(this, "imul");
+		EmitBinExpr(this, "mul");
 		break;
 	case AST_Division:
+		EmitBinExpr(this, "div");
 		break;
 	case AST_Modulo:
+		ErrorAt(this->node->Token, "Modulo is not supported!");
 		break;
 	}
 }
