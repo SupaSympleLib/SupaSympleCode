@@ -172,6 +172,13 @@ static AstNode *ParsePrimaryExpression(Parser *this)
 	{
 	case TK_Number:
 		return NewAstNode(AST_Number, Next(this), null);
+	case TK_OpenParen:
+	{
+		Next(this);
+		AstNode *expr = ParseExpression(this);
+		Match(this, TK_CloseParen);
+		return expr;
+	}
 	default:
 		ErrorAt(this->tok, "Expected expression");
 	}
@@ -265,6 +272,9 @@ static uint8_t GetUnaryOperatorPrecedence(const Token *tok)
 {
 	switch (tok->Kind)
 	{
+	case TK_SinKeyword:
+	case TK_CosinKeyword:
+		return 3;
 	case TK_Plus:
 	case TK_Minus:
 		return 2;
@@ -281,6 +291,10 @@ static AstKind GetUnaryOperatorNode(const Token *tok)
 		return AST_Positive;
 	case TK_Minus:
 		return AST_Negative;
+	case TK_SinKeyword:
+		return AST_Sin;
+	case TK_CosinKeyword:
+		return AST_Cosin;
 	default:
 		ErrorAt(tok, "Internal error (Getting unary operator node on invalid token)");
 		return AST_Null;

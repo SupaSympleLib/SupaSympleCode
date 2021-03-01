@@ -16,6 +16,8 @@ static void EmitStmt(Emitter *);
 static void EmitBlockStmt(Emitter *);
 
 static void EmitExpr(Emitter *);
+static void EmitUnCall(Emitter *, const char *fn);
+
 static void EmitBinExpr(Emitter *, const char *op);
 static void EmitBinCall(Emitter *this, const char *fn);
 
@@ -115,6 +117,12 @@ static void EmitExpr(Emitter *this)
 		Emitf(this, "\tmovsd -8(%%esp), %%xmm0");
 		break;
 	}
+	case AST_Sin:
+		EmitUnCall(this, "sin");
+		break;
+	case AST_Cosin:
+		EmitUnCall(this, "cos");
+		break;
 	case AST_Addition:
 		EmitBinExpr(this, "add");
 		break;
@@ -134,6 +142,17 @@ static void EmitExpr(Emitter *this)
 		EmitBinCall(this, "pow");
 		break;
 	}
+}
+
+static void EmitUnCall(Emitter *this, const char *fn)
+{
+	Next(this);
+
+	EmitExpr(this);
+	Emitf(this, "\tsub $8, %%esp");
+	Emitf(this, "\tmovsd %%xmm0, (%%esp)");
+	Emitf(this, "\tcall _%s", fn);
+	Emitf(this, "\tadd $8, %%esp");
 }
 
 static void EmitBinExpr(Emitter *this, const char *op)

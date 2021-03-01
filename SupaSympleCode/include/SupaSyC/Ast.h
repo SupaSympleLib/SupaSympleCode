@@ -20,6 +20,9 @@ typedef enum
 	AST_Modulo,
 	AST_Power,
 
+	AST_Sin,
+	AST_Cosin,
+
 	AST_Number,
 
 	AST_Call,
@@ -50,6 +53,9 @@ static const char *const AstKindNames[AST_Last + 1] =
 	"DivisionAst",
 	"ModuloAst",
 	"PowerAst",
+
+	"SinAst",
+	"CosinAst",
 
 	"NumberAst",
 

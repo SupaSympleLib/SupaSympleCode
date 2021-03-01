@@ -27,11 +27,13 @@ typedef enum
 
 	TK_VarKeyword,
 	TK_FuncKeyword,
+	TK_SinKeyword,
+	TK_CosinKeyword,
 
 
 	TK_Punctuation = TK_Plus,   // Start of punctuations
 	TK_Keyword = TK_VarKeyword, // Start of keywords
-	TK_Last = TK_FuncKeyword,
+	TK_Last = TK_CosinKeyword,
 } TokenKind;
 
 static const char *const TokenKindNames[TK_Last + 1] =
@@ -61,6 +63,8 @@ static const char *const TokenKindNames[TK_Last + 1] =
 
 	"VarKeyword",
 	"FuncKeyword",
+	"SinKeyword",
+	"CosinKeyword",
 };
 
 typedef struct

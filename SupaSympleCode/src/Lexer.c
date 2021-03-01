@@ -17,6 +17,7 @@ static void ParseNumber(Lexer *);
 static void ParseIdentifier(Lexer *);
 static void ParsePunctuation(Lexer *);
 static void ParseKeyword(Lexer *);
+static void ParseAlias(Lexer *);
 static void NewLexToken(Lexer *this, TokenKind kind, const char *beg);
 
 static bool IsDigit(char c)
@@ -124,6 +125,10 @@ static void ParseNumber(Lexer *this)
 	else if (!strncmp(beg, #key, this->p - beg))          \
 		return NewLexToken(this, TK_##word##Keyword, beg) \
 
+#define ALIAS(alias, to)                                \
+	else if (!strncmp(beg, #alias, this->p - beg))          \
+		return NewLexToken(this, TK_##to##, beg) \
+
 static void ParseIdentifier(Lexer *this)
 {
 	const char *beg = this->p;
@@ -134,6 +139,17 @@ static void ParseIdentifier(Lexer *this)
 	if (false); // Test if identifier is a keyword
 	KEYWORD(var, Var);
 	KEYWORD(func, Func);
+	KEYWORD(sin, Sin);
+	KEYWORD(cos, Cosin);
+	KEYWORD(cosin, Cosin);
+
+	ALIAS(plus, Plus);
+	ALIAS(minus, Minus);
+	ALIAS(times, Star);
+	ALIAS(divided_by, Slash);
+	ALIAS(modulo, Percent);
+	ALIAS(mod, Percent);
+	ALIAS(pow, Carot);
 
 	else
 		NewLexToken(this, TK_Identifier, beg);
