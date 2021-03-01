@@ -62,8 +62,8 @@ static void EmitFunc(Emitter *this)
 {
 	const Token *name = this->ast->Token;
 
-	Emitf(this, ".global  %.*s", name->Length, name->Text);
-	Emitf(this, "%.*s:", name->Length, name->Text);
+	Emitf(this, ".global  _%.*s", name->Length, name->Text);
+	Emitf(this, "_%.*s:", name->Length, name->Text);
 
 	const AstNode *body = this->ast->Body;
 	assert(body);
@@ -78,9 +78,13 @@ static void EmitStmt(Emitter *this)
 {
 	if (AstIsExpr(this->node))
 	{
+		const AstNode *node = this->node;
 		EmitExpr(this);
-		Emitf(this, "\tcall _SSyc.print");
-		Emitf(this);
+		if (node->Kind != AST_Call)
+		{
+			Emitf(this, "\tcall _SSyc.print");
+			Emitf(this);
+		}
 	}
 
 	switch (this->node->Kind)
@@ -156,6 +160,18 @@ static void EmitExpr(Emitter *this)
 		break;
 	case AST_Power:
 		EmitBinCall(this, "pow");
+		break;
+
+	case AST_Call:
+	{
+		const Token *name = Next(this)->Token;
+		Emitf(this, "\tcall _%.*s", name->Length, name->Text);
+		break;
+	}
+
+	default:
+		// Continue...
+		Next(this);
 		break;
 	}
 }

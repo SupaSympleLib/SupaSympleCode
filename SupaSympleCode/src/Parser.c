@@ -18,6 +18,7 @@ static AstNode *ParseExpression(Parser *);
 static AstNode *ParseUnaryExpression(Parser *, uint8_t parentPrecedence);
 static AstNode *ParseBinaryExpression(Parser *, uint8_t parentPrecedence);
 static AstNode *ParsePrimaryExpression(Parser *);
+static AstNode *ParseCallExpression(Parser *);
 
 static AstNode *NewUnaryAst(const Token *opertorToken, AstNode *operand);
 static AstNode *NewBinaryAst(const Token *opertorToken, AstNode *left, const AstNode *right);
@@ -174,6 +175,9 @@ static AstNode *ParsePrimaryExpression(Parser *this)
 {
 	switch (this->tok->Kind)
 	{
+	case TK_CallKeyword:
+		Match(this, TK_CallKeyword);
+		return NewAstNode(AST_Call, Match(this, TK_Identifier), null);
 	case TK_Number:
 		return NewAstNode(AST_Number, Next(this), null);
 	case TK_OpenParen:

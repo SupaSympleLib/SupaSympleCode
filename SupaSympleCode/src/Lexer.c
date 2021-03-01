@@ -138,6 +138,8 @@ static void ParseIdentifier(Lexer *this)
 
 	if (false); // Test if identifier is a keyword
 	KEYWORD(var, Var);
+	KEYWORD(call, Call);
+	KEYWORD(exec, Call);
 	KEYWORD(func, Func);
 	KEYWORD(sin, Sin);
 	KEYWORD(cos, Cosin);

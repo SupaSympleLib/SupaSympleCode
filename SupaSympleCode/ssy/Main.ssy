@@ -1,10 +1,11 @@
-func _main
+func main
 {
-	6 + 9.5;
-	7 - 2;
-	12.6 mod 5;
-	3 ^ 3;
-	sin 3.1415926535;
+	6 + 9;
 
-	-5;
+	call Multiply;
+}
+
+func Multiply
+{
+	6 * 9;
 }

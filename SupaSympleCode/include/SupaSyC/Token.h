@@ -26,6 +26,7 @@ typedef enum
 
 
 	TK_VarKeyword,
+	TK_CallKeyword,
 	TK_FuncKeyword,
 	TK_SinKeyword,
 	TK_CosinKeyword,
@@ -62,6 +63,7 @@ static const char *const TokenKindNames[TK_Last + 1] =
 
 
 	"VarKeyword",
+	"CallKeyword",
 	"FuncKeyword",
 	"SinKeyword",
 	"CosinKeyword",
