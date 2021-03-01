@@ -6,6 +6,4 @@ _main:
 	pop     %edx
 	imul    %edx, %eax
 
-	mov     $6, %eax
-	mov     $6, %eax
 	ret

@@ -46,9 +46,7 @@ static void EmitFunc(Emitter *this)
 	const AstNode *body = this->ast->Body;
 	assert(body);
 	this->node = body;
-	do
-		EmitStmt(this);
-	while (body = body->Next);
+	EmitStmt(this);
 
 	Emitf(this, "\tret");
 }
@@ -72,6 +70,8 @@ static void EmitBlockStmt(Emitter *this)
 
 	while (this->node->Kind != AST_EndBlock)
 		EmitStmt(this);
+
+	Next(this);
 }
 
 static void EmitExpr(Emitter *this)
