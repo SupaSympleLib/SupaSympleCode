@@ -29,11 +29,13 @@ void Emit(File *file, const AstObject *ast)
 	Emitf(this);
 
 	Emitf(this, "_SSyc.print:");
-	Emitf(this, "\tsub $8, %%esp");
-	Emitf(this, "\tmovss %%xmm0, 4(%%esp)");
-	Emitf(this, "\tmovl $_SSyc.fmt, (%%esp)");
+	Emitf(this, "\tsub $12, %%esp");
+	Emitf(this, "\tcvtss2sd %%xmm0, %%xmm0");
+	Emitf(this, "\tmovsd %%xmm0, 4(%%esp)");
+	Emitf(this, "\tmov $_SSyc.fmt, %%eax");
+	Emitf(this, "\tmov %%eax, (%%esp)");
 	Emitf(this, "\tcall _printf");
-	Emitf(this, "\tadd $8, %%esp");
+	Emitf(this, "\tadd $12, %%esp");
 	Emitf(this, "\tret");
 	Emitf(this);
 
@@ -71,12 +73,7 @@ static void EmitStmt(Emitter *this)
 	if (AstIsExpr(this->node))
 	{
 		EmitExpr(this);
-		//Emitf(this, "\tcall _SSyc.print");
-		Emitf(this, "\tsub $8, %%esp");
-		Emitf(this, "\tmovss %%xmm0, 4(%%esp)");
-		Emitf(this, "\tmovl $_SSyc.fmt, (%%esp)");
-		Emitf(this, "\tcall _printf");
-		Emitf(this, "\tadd $8, %%esp");
+		Emitf(this, "\tcall _SSyc.print");
 		Emitf(this);
 	}
 
