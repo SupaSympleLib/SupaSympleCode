@@ -39,6 +39,7 @@ int main()
 		puts("Starting program...");
 		SetConsoleColor(ConsoleColor_Reset);
 		int ec = system("sy\\Main.exe");
+		printf("Value: %f\n", *(float*)&ec);
 		SetConsoleColor(ConsoleColor_Yellow);
 		printf("\nProgram exited with code %i (0x%x)\n", ec, ec);
 	}

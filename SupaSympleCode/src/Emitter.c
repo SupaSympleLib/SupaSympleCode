@@ -48,6 +48,10 @@ static void EmitFunc(Emitter *this)
 	this->node = body;
 	EmitStmt(this);
 
+	Emitf(this, "\tsub $4, %%esp");
+	Emitf(this, "\tmovss %%xmm0, (%%esp)");
+	Emitf(this, "\tmov (%%esp), %%eax");
+	Emitf(this, "\tadd $4, %%esp");
 	Emitf(this, "\tret");
 }
 
@@ -81,7 +85,16 @@ static void EmitExpr(Emitter *this)
 	case AST_Number:
 	{
 		const Token *num = Next(this)->Token;
-		Emitf(this, "\tmov     $%.*s, %%eax", num->Length, num->Text);
+		Emitf(this, "\tsub $4, %%esp");
+		union
+		{
+			float fval;
+			int ival;
+		} val;
+		val.fval = strtof(num->Text, null);
+		Emitf(this, "\tmovl $0x%x, (%%esp) # %f", val.ival, val.fval);
+		Emitf(this, "\tmovss (%%esp), %%xmm0");
+		Emitf(this, "\tadd $4, %%esp");
 		break;
 	}
 	case AST_Addition:
@@ -94,27 +107,8 @@ static void EmitExpr(Emitter *this)
 		EmitBinExpr(this, "imul");
 		break;
 	case AST_Division:
-		Next(this);
-
-		EmitExpr(this);
-		Emitf(this, "\tpush    %%eax");
-		EmitExpr(this);
-		Emitf(this, "\tpop     %%ecx");
-		Emitf(this, "\tcltd");
-		Emitf(this, "\tidiv    %%ecx");
-		Emitf(this);
 		break;
 	case AST_Modulo:
-		Next(this);
-
-		EmitExpr(this);
-		Emitf(this, "\tpush    %%eax");
-		EmitExpr(this);
-		Emitf(this, "\tpop     %%ecx");
-		Emitf(this, "\tcltd");
-		Emitf(this, "\tidiv    %%ecx");
-		Emitf(this, "\tmov     %%edx, %%eax");
-		Emitf(this);
 		break;
 	}
 }
@@ -124,10 +118,12 @@ static void EmitBinExpr(Emitter *this, const char *op)
 	Next(this);
 
 	EmitExpr(this);
-	Emitf(this, "\tpush    %%eax");
+	Emitf(this, "\tsub $4, %%esp");
+	Emitf(this, "\tmovss %%xmm0, (%%esp)");
 	EmitExpr(this);
-	Emitf(this, "\tpop     %%edx");
-	Emitf(this, "\t%-7s %%edx, %%eax", op);
+	Emitf(this, "\tmovss (%%esp), %%xmm1");
+	Emitf(this, "\tadd $4, %%esp");
+	Emitf(this, "\t%sss %%xmm1, %%xmm0", op);
 	Emitf(this);
 }
 

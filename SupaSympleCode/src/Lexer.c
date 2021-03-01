@@ -20,7 +20,7 @@ static void ParseKeyword(Lexer *);
 static void NewLexToken(Lexer *this, TokenKind kind, const char *beg);
 
 static bool IsDigit(char c)
-{ return c >= '0' && c <= '9'; }
+{ return c >= '0' && c <= '9' || c == '.'; }
 static bool IsIdentifier(char c)
 { return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_'; }
 static bool IsWhiteSpace(char c)
