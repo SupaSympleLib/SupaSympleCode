@@ -71,6 +71,10 @@ static AstNode *ParseStatement(Parser *this, bool matchSemi)
 	AstNode *stmt;
 	switch (this->tok->Kind)
 	{
+	case TK_Semicolon:
+		stmt = NewAstNode(AST_Null, Next(this), null);
+		matchSemi = false;
+		break;
 	case TK_OpenBrace:
 		stmt = ParseBlockStatement(this);
 		matchSemi = false;

@@ -122,6 +122,10 @@ static void EmitExpr(Emitter *this)
 		Emitf(this, "\tmovsd -8(%%esp), %%xmm0");
 		break;
 	}
+	case AST_Positive:
+		Next(this);
+		EmitExpr(this);
+		break;
 	case AST_Negative:
 		Next(this);
 
