@@ -48,10 +48,8 @@ static void EmitFunc(Emitter *this)
 	this->node = body;
 	EmitStmt(this);
 
-	Emitf(this, "\tsub $4, %%esp");
-	Emitf(this, "\tmovss %%xmm0, (%%esp)");
-	Emitf(this, "\tmov (%%esp), %%eax");
-	Emitf(this, "\tadd $4, %%esp");
+	Emitf(this, "\tmovss %%xmm0, -4(%%esp)");
+	Emitf(this, "\tmov -4(%%esp), %%eax");
 	Emitf(this, "\tret");
 }
 
@@ -85,16 +83,14 @@ static void EmitExpr(Emitter *this)
 	case AST_Number:
 	{
 		const Token *num = Next(this)->Token;
-		Emitf(this, "\tsub $4, %%esp");
 		union
 		{
 			float fval;
 			int ival;
 		} val;
 		val.fval = strtof(num->Text, null);
-		Emitf(this, "\tmovl $0x%x, (%%esp) # %f", val.ival, val.fval);
-		Emitf(this, "\tmovss (%%esp), %%xmm0");
-		Emitf(this, "\tadd $4, %%esp");
+		Emitf(this, "\tmovl $0x%x, -4(%%esp) # %f", val.ival, val.fval);
+		Emitf(this, "\tmovss -4(%%esp), %%xmm0");
 		break;
 	}
 	case AST_Addition:
