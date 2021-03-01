@@ -106,8 +106,8 @@
     <ClInclude Include="include\SupaSyC\Token.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="sy\Main.S" />
-    <None Include="sy\Main.sy" />
+    <None Include="ssy\Main.S" />
+    <None Include="ssy\Main.ssy" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

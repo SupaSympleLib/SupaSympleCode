@@ -6,7 +6,7 @@ static void PrintEval(const AstNode *);
 
 int main()
 {
-	File *file = OpenFile("sy/Main.sy", FILEMODE_READ);
+	File *file = OpenFile("ssy/Main.ssy", FILEMODE_READ);
 	SetConsoleColor(ConsoleColor_Yellow);
 	printf("Source of '%s':\n", file->Name);
 	SetConsoleColor(ConsoleColor_DarkCyan);
@@ -25,20 +25,20 @@ int main()
 
 	//PrintEval(ast);
 
-	File *out = OpenFile("sy/Main.S", FILEMODE_READ_WRITE);
+	File *out = OpenFile("ssy/Main.S", FILEMODE_READ_WRITE);
 	Emit(out, ast);
 
 	CloseFile(out);
 	CloseFile(file);
 
 	SetConsoleColor(ConsoleColor_Reset);
-	int comp = system("clang -m32 sy/Main.S -o sy/Main.exe --debug -l legacy_stdio_definitions");
+	int comp = system("clang -m32 ssy/Main.S -o ssy/Main.exe --debug -l legacy_stdio_definitions");
 	if (!comp)
 	{
 		SetConsoleColor(ConsoleColor_Yellow);
 		puts("Starting program...");
 		SetConsoleColor(ConsoleColor_Reset);
-		int ec = system("sy\\Main.exe");
+		int ec = system("ssy\\Main.exe");
 		SetConsoleColor(ConsoleColor_Yellow);
 		printf("\nProgram exited with code %i (0x%x)\n", ec, ec);
 	}

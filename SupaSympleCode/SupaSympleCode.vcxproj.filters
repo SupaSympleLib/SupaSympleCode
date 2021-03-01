@@ -64,7 +64,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="sy\Main.sy" />
-    <None Include="sy\Main.S" />
+    <None Include="ssy\Main.S" />
+    <None Include="ssy\Main.ssy" />
   </ItemGroup>
 </Project>
