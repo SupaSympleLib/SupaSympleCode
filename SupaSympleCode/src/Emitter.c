@@ -27,6 +27,11 @@ void Emit(File *file, const AstObject *ast)
 {
 	Emitter *this = &(Emitter) { file, ast };
 
+	Emitf(this, "_SSyc.neg0:");
+	Emitf(this, "\t.quad 0x8000000000000000");
+	Emitf(this, "\t.quad 0x8000000000000000");
+	Emitf(this);
+
 	Emitf(this, "_SSyc.fmt:");
 	Emitf(this, "\t.string \"Value: %%f\\n\"");
 	Emitf(this);
@@ -117,6 +122,13 @@ static void EmitExpr(Emitter *this)
 		Emitf(this, "\tmovsd -8(%%esp), %%xmm0");
 		break;
 	}
+	case AST_Negative:
+		Next(this);
+
+		EmitExpr(this);
+		Emitf(this, "\tmovaps _SSyc.neg0, %%xmm1");
+		Emitf(this, "\tpxor %%xmm1, %%xmm0");
+		break;
 	case AST_Sin:
 		EmitUnCall(this, "sin");
 		break;
