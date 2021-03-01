@@ -13,6 +13,7 @@ typedef enum
 	TK_Star,
 	TK_Slash,
 	TK_Percent,
+	TK_Carot,
 
 	TK_Equal,
 
@@ -46,6 +47,7 @@ static const char *const TokenKindNames[TK_Last + 1] =
 	"StarToken",
 	"SlashToken",
 	"PercentToken",
+	"CarotToken",
 
 	"EqualToken",
 

@@ -17,6 +17,7 @@ static void EmitBlockStmt(Emitter *);
 
 static void EmitExpr(Emitter *);
 static void EmitBinExpr(Emitter *, const char *op);
+static void EmitBinCall(Emitter *this, const char *fn);
 
 static const AstNode *Next(Emitter *);
 
@@ -127,18 +128,10 @@ static void EmitExpr(Emitter *this)
 		EmitBinExpr(this, "div");
 		break;
 	case AST_Modulo:
-		//ErrorAt(this->node->Token, "Modulo is not supported!");
-		Next(this);
-
-		EmitExpr(this);
-		Emitf(this, "\tsub $16, %%esp");
-		Emitf(this, "\tmovsd %%xmm0, 8(%%esp)");
-		EmitExpr(this);
-		Emitf(this, "\tmovsd %%xmm0, (%%esp)");
-		Emitf(this, "\tcall _fmod");
-		Emitf(this, "\tfstl (%%esp)");
-		Emitf(this, "\tmovsd (%%esp), %%xmm0");
-		Emitf(this, "\tadd $16, %%esp");
+		EmitBinCall(this, "fmod");
+		break;
+	case AST_Power:
+		EmitBinCall(this, "pow");
 		break;
 	}
 }
@@ -154,6 +147,21 @@ static void EmitBinExpr(Emitter *this, const char *op)
 	Emitf(this, "\tmovsd (%%esp), %%xmm1");
 	Emitf(this, "\tadd $8, %%esp");
 	Emitf(this, "\t%ssd %%xmm1, %%xmm0", op);
+}
+
+static void EmitBinCall(Emitter *this, const char *fn)
+{
+	Next(this);
+
+	EmitExpr(this);
+	Emitf(this, "\tsub $16, %%esp");
+	Emitf(this, "\tmovsd %%xmm0, 8(%%esp)");
+	EmitExpr(this);
+	Emitf(this, "\tmovsd %%xmm0, (%%esp)");
+	Emitf(this, "\tcall _%s", fn);
+	Emitf(this, "\tfstl (%%esp)");
+	Emitf(this, "\tmovsd (%%esp), %%xmm0");
+	Emitf(this, "\tadd $16, %%esp");
 }
 
 static const AstNode *Next(Emitter *this)

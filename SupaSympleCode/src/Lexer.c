@@ -143,7 +143,7 @@ static void ParsePunctuation(Lexer *this)
 {
 	const char *const punctuations[] =
 	{
-		"+", "-", "*", "/", "%",
+		"+", "-", "*", "/", "%", "^",
 		"=",
 		";",
 		"(", ")", "{", "}",
